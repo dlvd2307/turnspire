@@ -6,6 +6,7 @@ const CharacterPanel = () => {
     characters,
     removeCondition,
     clearConcentration,
+    updateCharacterHP,
   } = useCombat();
 
   const selectedCharacter = characters.find((char) => char.id === selectedCharacterId);
@@ -16,7 +17,16 @@ const CharacterPanel = () => {
   return (
     <div className="bg-gray-800 text-white p-4 rounded shadow max-w-md w-full mt-4">
       <h2 className="text-xl font-semibold mb-2">{name}</h2>
-      <p className="mb-2">HP: {hp} / {maxHp}</p>
+      <p className="mb-2">
+        HP:{" "}
+        <input
+          type="number"
+          value={hp}
+          onChange={(e) => updateCharacterHP(selectedCharacter.id, parseInt(e.target.value) || 0)}
+          className="ml-2 w-16 text-black px-1 rounded"
+        />
+        {" "} / {maxHp}
+      </p>
       <p className="mb-2">Type: {type === "enemy" ? "Enemy" : "Character"}</p>
 
       {conditions.length > 0 && (

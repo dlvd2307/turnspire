@@ -30,6 +30,14 @@ export const CombatProvider = ({ children }) => {
     );
   };
 
+  const updateCharacterHP = (id, newHP) => {
+    setCharacters((prev) =>
+      prev.map((char) =>
+        char.id === id ? { ...char, hp: Math.max(0, Math.min(newHP, char.maxHp)) } : char
+      )
+    );
+  };
+
   const selectCharacter = (id) => {
     setSelectedCharacterId(id);
   };
@@ -126,6 +134,7 @@ export const CombatProvider = ({ children }) => {
         setCharacters,
         addCharacter,
         updateCharacterPosition,
+        updateCharacterHP,
         selectCharacter,
         selectedCharacterId,
         applyCondition,

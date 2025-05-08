@@ -1,122 +1,122 @@
-import { createContext, useContext, useState, useEffect, useRef } from "react";
+import { createContext, useContext, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 const CombatContext = createContext();
 
-export const useCombat = () => useContext(CombatContext);
-
 export const CombatProvider = ({ children }) => {
   const [characters, setCharacters] = useState([]);
-  const [selectedCharacterId, setSelectedCharacterId] = useState(null);
+  const [currentTurn, setCurrentTurn] = useState(0);
   const [round, setRound] = useState(1);
-  const [gridConfig, setGridConfig] = useState({
-    rows: 20,
-    cols: 20,
-    squareSize: 40,
-  });
+  const [selectedCharacterId, setSelectedCharacterId] = useState(null);
+  const [gridConfig, setGridConfig] = useState({ rows: 20, cols: 20, squareSize: 40 });
   const [spellMarkers, setSpellMarkers] = useState([]);
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
-  const [lastState, setLastState] = useState(null);
 
-  const selectedCharacterRef = useRef(null);
-  const selectedMarkerRef = useRef(null);
-
-  useEffect(() => {
-    selectedCharacterRef.current = selectedCharacterId;
-    selectedMarkerRef.current = selectedMarkerId;
-  }, [selectedCharacterId, selectedMarkerId]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Delete" || e.key === "Backspace") {
-        const currentChar = selectedCharacterRef.current;
-        const currentMarker = selectedMarkerRef.current;
-
-        if (currentMarker) {
-          backupState();
-          setSpellMarkers((prev) => prev.filter((m) => m.id !== currentMarker));
-          setSelectedMarkerId(null);
-        } else if (currentChar) {
-          backupState();
-          setCharacters((prev) =>
-            prev.map((c) =>
-              c.id === currentChar ? { ...c, defeated: true } : c
-            )
-          );
-        }
-      }
-
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
-        undoLastChange();
-      }
+  const addCharacter = (char) => {
+    const newChar = {
+      ...char,
+      id: uuidv4(),
+      position: { x: 0, y: 0 },
+      conditions: [],
+      concentration: null,
+      defeated: false,
     };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const backupState = () => {
-    setLastState({
-      characters: JSON.parse(JSON.stringify(characters)),
-      spellMarkers: JSON.parse(JSON.stringify(spellMarkers)),
-      round,
-    });
-  };
-
-  const undoLastChange = () => {
-    if (!lastState) return;
-    setCharacters(lastState.characters);
-    setSpellMarkers(lastState.spellMarkers);
-    setRound(lastState.round);
-    setLastState(null);
-  };
-
-  const nextTurn = () => {
-    backupState();
-
-    const active = characters
-      .filter((c) => !c.defeated)
-      .sort((a, b) => b.initiative - a.initiative);
-
-    if (active.length === 0) return;
-
-    const currentIndex = active.findIndex((c) => c.id === selectedCharacterId);
-    const nextIndex = (currentIndex + 1) % active.length;
-
-    if (nextIndex === 0) setRound((r) => r + 1);
-
-    setSelectedCharacterId(active[nextIndex].id);
-
-    setCharacters((prev) =>
-      prev.map((c) => {
-        const updated = { ...c };
-        if (updated.conditions) {
-          updated.conditions = updated.conditions
-            .map((cond) =>
-              cond.duration > 0 ? { ...cond, duration: cond.duration - 1 } : cond
-            )
-            .filter((cond) => cond.duration !== 0);
-        }
-
-        if (updated.concentration && updated.concentration.duration > 0) {
-          updated.concentration.duration -= 1;
-          if (updated.concentration.duration === 0) updated.concentration = null;
-        }
-
-        return updated;
-      })
-    );
+    setCharacters((prev) => [...prev, newChar]);
   };
 
   const updateCharacterPosition = (id, position) => {
-    backupState();
     setCharacters((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, position } : c))
+      prev.map((char) => (char.id === id ? { ...char, position } : char))
     );
   };
 
   const selectCharacter = (id) => {
     setSelectedCharacterId(id);
-    setSelectedMarkerId(null);
+  };
+
+  const applyCondition = (id, condition) => {
+    setCharacters((prev) =>
+      prev.map((char) =>
+        char.id === id
+          ? { ...char, conditions: [...char.conditions, condition] }
+          : char
+      )
+    );
+  };
+
+  const applyConcentration = (id, spell) => {
+    setCharacters((prev) =>
+      prev.map((char) =>
+        char.id === id ? { ...char, concentration: spell } : char
+      )
+    );
+  };
+
+  const removeCondition = (id, conditionName) => {
+    setCharacters((prev) =>
+      prev.map((char) =>
+        char.id === id
+          ? {
+              ...char,
+              conditions: char.conditions.filter((c) => c.name !== conditionName),
+            }
+          : char
+      )
+    );
+  };
+
+  const clearConcentration = (id) => {
+    setCharacters((prev) =>
+      prev.map((char) =>
+        char.id === id ? { ...char, concentration: null } : char
+      )
+    );
+  };
+
+  const markDefeated = (id) => {
+    setCharacters((prev) =>
+      prev.map((char) => (char.id === id ? { ...char, defeated: true } : char))
+    );
+  };
+
+  const removeCharacter = (id) => {
+    setCharacters((prev) => prev.filter((char) => char.id !== id));
+  };
+
+  const nextTurn = () => {
+    const activeChars = characters.filter((c) => !c.defeated);
+    if (activeChars.length === 0) return;
+
+    const sorted = [...activeChars].sort((a, b) => b.initiative - a.initiative);
+    const nextIndex = (currentTurn + 1) % sorted.length;
+
+    setCurrentTurn(nextIndex);
+    if (nextIndex === 0) {
+      setRound((r) => r + 1);
+    }
+
+    // Tick down conditions and concentration
+    setCharacters((prev) =>
+      prev.map((char) => {
+        const newConditions = char.conditions
+          .map((c) => ({ ...c, remainingRounds: c.remainingRounds - 1 }))
+          .filter((c) => c.remainingRounds > 0);
+
+        const newConcentration =
+          char.concentration && char.concentration.remainingRounds > 1
+            ? {
+                ...char.concentration,
+                remainingRounds: char.concentration.remainingRounds - 1,
+              }
+            : null;
+
+        return {
+          ...char,
+          conditions: newConditions,
+          concentration: newConcentration,
+        };
+      })
+    );
   };
 
   return (
@@ -124,23 +124,30 @@ export const CombatProvider = ({ children }) => {
       value={{
         characters,
         setCharacters,
+        addCharacter,
+        updateCharacterPosition,
+        selectCharacter,
         selectedCharacterId,
-        setSelectedCharacterId,
+        applyCondition,
+        applyConcentration,
+        removeCondition,
+        clearConcentration,
+        markDefeated,
+        removeCharacter,
+        nextTurn,
+        currentTurn,
         round,
-        setRound,
         gridConfig,
         setGridConfig,
-        updateCharacterPosition,
-        nextTurn,
         spellMarkers,
         setSpellMarkers,
         selectedMarkerId,
         setSelectedMarkerId,
-        undoLastChange,
-        selectCharacter,
       }}
     >
       {children}
     </CombatContext.Provider>
   );
 };
+
+export const useCombat = () => useContext(CombatContext);

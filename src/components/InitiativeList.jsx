@@ -1,10 +1,10 @@
-import { useCombat } from "../context/CombatContext";
+]import { useCombat } from "../context/CombatContext";
 import { useState } from "react";
 
 const InitiativeList = () => {
   const { characters, currentTurn } = useCombat();
 
-  // Build grouped and ungrouped collections
+  // Separate grouped and ungrouped characters
   const grouped = {};
   const ungrouped = [];
 
@@ -18,6 +18,14 @@ const InitiativeList = () => {
       ungrouped.push({ ...char, index });
     }
   });
+
+  // Sort ungrouped characters by initiative (descending)
+  const sortedUngrouped = [...ungrouped].sort((a, b) => b.initiative - a.initiative);
+
+  // Sort groups by first member's initiative (descending)
+  const sortedGrouped = Object.entries(grouped).sort(
+    ([, a], [, b]) => b[0].initiative - a[0].initiative
+  );
 
   const [expandedGroups, setExpandedGroups] = useState({});
 
@@ -33,7 +41,7 @@ const InitiativeList = () => {
       <h2 className="text-xl font-semibold mb-2">Initiative Order</h2>
       <ul className="space-y-2">
         {/* Render ungrouped characters */}
-        {ungrouped.map((char) => (
+        {sortedUngrouped.map((char) => (
           <li
             key={char.id}
             className={`p-2 rounded ${
@@ -48,9 +56,10 @@ const InitiativeList = () => {
         ))}
 
         {/* Render grouped characters */}
-        {Object.entries(grouped).map(([groupName, members]) => {
+        {sortedGrouped.map(([groupName, members]) => {
           const isExpanded = expandedGroups[groupName];
           const isGroupTurn = members.some((m) => m.index === currentTurn);
+          const groupInit = members[0]?.initiative ?? 0;
 
           return (
             <li key={groupName} className="bg-gray-800 rounded p-2">
@@ -62,7 +71,7 @@ const InitiativeList = () => {
               >
                 <span>{isExpanded ? "▼" : "►"} {groupName}</span>
                 <span className="text-gray-400">
-                  Init: {members[0].initiative}
+                  Init: {groupInit}
                 </span>
               </div>
               {isExpanded && (

@@ -1,4 +1,4 @@
-]import { useCombat } from "../context/CombatContext";
+import { useCombat } from "../context/CombatContext";
 import { useState } from "react";
 
 const InitiativeList = () => {

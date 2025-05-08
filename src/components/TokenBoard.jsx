@@ -13,6 +13,8 @@ const TokenBoard = () => {
     setSpellMarkers,
     selectedMarkerId,
     setSelectedMarkerId,
+    markDefeated,
+    removeCharacter,
   } = useCombat();
 
   const { rows, cols, squareSize } = gridConfig;
@@ -52,10 +54,36 @@ const TokenBoard = () => {
     }
   }, [selectedMarkerId, spellMarkers]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Delete" || e.key === "Backspace") {
+        if (selectedCharacterId) {
+          const char = characters.find(c => c.id === selectedCharacterId);
+          if (char && !char.defeated) {
+            markDefeated(selectedCharacterId);
+          } else {
+            const confirmed = confirm("Remove this character from the board?");
+            if (confirmed) {
+              removeCharacter(selectedCharacterId);
+            }
+          }
+          selectCharacter(null);
+        } else if (selectedMarkerId) {
+          const confirmed = confirm("Remove this spell marker?");
+          if (confirmed) {
+            setSpellMarkers((prev) => prev.filter((m) => m.id !== selectedMarkerId));
+            setSelectedMarkerId(null);
+          }
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedCharacterId, selectedMarkerId, characters]);
+
   return (
     <div className="mx-auto mb-6 border border-gray-700 rounded overflow-hidden">
       <Stage width={width} height={height} draggable style={{ backgroundColor: "#1F2937" }}>
-        {/* Grid Layer */}
         <Layer>
           {Array.from({ length: rows }).map((_, row) =>
             Array.from({ length: cols }).map((_, col) => (
@@ -71,7 +99,6 @@ const TokenBoard = () => {
           )}
         </Layer>
 
-        {/* Spell Marker Layer */}
         <Layer>
           {spellMarkers.map((m) => {
             const sizePx = m.squares * squareSize;
@@ -135,8 +162,6 @@ const TokenBoard = () => {
                     strokeWidth={2}
                   />
                 )}
-
-                {/* Marker Label */}
                 <Text
                   text={m.label}
                   fontSize={12}
@@ -146,8 +171,6 @@ const TokenBoard = () => {
                   y={sizePx + 2}
                   width={sizePx}
                 />
-
-                {/* ✖ Delete Button */}
                 <Text
                   text="✖"
                   fontSize={14}
@@ -171,7 +194,6 @@ const TokenBoard = () => {
           <Transformer ref={transformerRef} rotateEnabled={true} enabledAnchors={[]} />
         </Layer>
 
-        {/* Tokens Layer */}
         <Layer>
           {characters.map((char) => {
             const { hp = 100, maxHp = 100 } = char;

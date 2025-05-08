@@ -14,7 +14,7 @@ const CharacterPanel = () => {
   const { name, hp, maxHp, type, conditions, concentration } = selectedCharacter;
 
   return (
-    <div className="fixed bottom-4 left-4 bg-gray-800 text-white p-4 rounded shadow-lg max-w-sm w-full z-50">
+    <div className="bg-gray-800 text-white p-4 rounded shadow max-w-md w-full mt-4">
       <h2 className="text-xl font-semibold mb-2">{name}</h2>
       <p className="mb-2">HP: {hp} / {maxHp}</p>
       <p className="mb-2">Type: {type === "enemy" ? "Enemy" : "Character"}</p>

@@ -147,10 +147,9 @@ const App = () => {
           <ConditionManager />
           <ConcentrationManager />
           <StatusOverview />
+          <CharacterPanel />
         </div>
       </div>
-
-      <CharacterPanel />
 
       {/* Footer Message */}
       <footer className="mt-10 text-center text-sm text-gray-400">

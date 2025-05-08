@@ -14,7 +14,6 @@ const TokenBoard = () => {
     selectedMarkerId,
     setSelectedMarkerId,
     markDefeated,
-    removeCharacter,
   } = useCombat();
 
   const { rows, cols, squareSize } = gridConfig;
@@ -53,33 +52,6 @@ const TokenBoard = () => {
       }
     }
   }, [selectedMarkerId, spellMarkers]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Delete" || e.key === "Backspace") {
-        if (selectedCharacterId) {
-          const char = characters.find(c => c.id === selectedCharacterId);
-          if (char && !char.defeated) {
-            markDefeated(selectedCharacterId);
-          } else {
-            const confirmed = confirm("Remove this character from the board?");
-            if (confirmed) {
-              removeCharacter(selectedCharacterId);
-            }
-          }
-          selectCharacter(null);
-        } else if (selectedMarkerId) {
-          const confirmed = confirm("Remove this spell marker?");
-          if (confirmed) {
-            setSpellMarkers((prev) => prev.filter((m) => m.id !== selectedMarkerId));
-            setSelectedMarkerId(null);
-          }
-        }
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedCharacterId, selectedMarkerId, characters]);
 
   return (
     <div className="mx-auto mb-6 border border-gray-700 rounded overflow-hidden">
@@ -170,23 +142,6 @@ const TokenBoard = () => {
                   x={0}
                   y={sizePx + 2}
                   width={sizePx}
-                />
-                <Text
-                  text="✖"
-                  fontSize={14}
-                  fill="#f87171"
-                  x={sizePx - 12}
-                  y={-6}
-                  width={12}
-                  height={12}
-                  onClick={() => {
-                    const confirmed = confirm("Remove this spell marker?");
-                    if (confirmed) {
-                      setSpellMarkers((prev) => prev.filter((marker) => marker.id !== m.id));
-                      setSelectedMarkerId(null);
-                    }
-                  }}
-                  style={{ cursor: "pointer" }}
                 />
               </Group>
             );

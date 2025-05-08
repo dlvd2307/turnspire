@@ -9,6 +9,7 @@ import ScenarioLibrary from "./components/ScenarioLibrary";
 import SpellMarkerForm from "./components/SpellMarkerForm";
 import StatusOverview from "./components/StatusOverview";
 import HelpPopup from "./components/HelpPopup";
+import GridSettings from "./components/GridSettings"; // ✅ Added
 import { useCombat } from "./context/CombatContext";
 import { useRef, useState, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
@@ -128,6 +129,7 @@ const App = () => {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3">
           <ScenarioLibrary />
+          <GridSettings /> {/* ✅ Restored here */}
           <CharacterForm />
           <EnemyForm />
           <SpellMarkerForm />
@@ -151,7 +153,6 @@ const App = () => {
         </div>
       </div>
 
-      {/* Footer Message */}
       <footer className="mt-10 text-center text-sm text-gray-400">
         <p>Thank you for using Turnspire.</p>
         <p>
@@ -162,7 +163,6 @@ const App = () => {
         </p>
       </footer>
 
-      {/* Help Button and Popup */}
       <button
         onClick={() => setIsHelpOpen(true)}
         className="fixed bottom-4 right-4 bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-3 py-2 rounded-full shadow-lg"
@@ -172,7 +172,6 @@ const App = () => {
       </button>
       <HelpPopup isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
 
-      {/* Vercel Analytics */}
       <Analytics />
     </div>
   );

@@ -96,14 +96,15 @@ export const CombatProvider = ({ children }) => {
     if (activeChars.length === 0) return;
 
     const sorted = [...activeChars].sort((a, b) => b.initiative - a.initiative);
-    const nextIndex = (currentTurn + 1) % sorted.length;
+    let nextIndex = (currentTurn + 1) % sorted.length;
+    let nextId = sorted[nextIndex]?.id;
+    const actualSortedIndex = sorted.findIndex((c) => c.id === nextId);
 
-    setCurrentTurn(nextIndex);
-    if (nextIndex === 0) {
+    setCurrentTurn(actualSortedIndex);
+    if (actualSortedIndex === 0) {
       setRound((r) => r + 1);
     }
 
-    // Tick down conditions and concentration
     setCharacters((prev) =>
       prev.map((char) => {
         const newConditions = char.conditions

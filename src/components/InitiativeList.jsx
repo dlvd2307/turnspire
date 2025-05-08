@@ -2,20 +2,20 @@ import { useCombat } from "../context/CombatContext";
 import { useState } from "react";
 
 const InitiativeList = () => {
-  const { characters, currentTurn } = useCombat();
+  const { characters, currentTurnId } = useCombat();
 
   // Separate grouped and ungrouped characters
   const grouped = {};
   const ungrouped = [];
 
-  characters.forEach((char, index) => {
+  characters.forEach((char) => {
     if (char.groupName) {
       if (!grouped[char.groupName]) {
         grouped[char.groupName] = [];
       }
-      grouped[char.groupName].push({ ...char, index });
+      grouped[char.groupName].push(char);
     } else {
-      ungrouped.push({ ...char, index });
+      ungrouped.push(char);
     }
   });
 
@@ -24,7 +24,7 @@ const InitiativeList = () => {
 
   // Sort groups by first member's initiative (descending)
   const sortedGrouped = Object.entries(grouped).sort(
-    ([, a], [, b]) => b[0].initiative - a[0].initiative
+    ([, a], [, b]) => (b[0]?.initiative || 0) - (a[0]?.initiative || 0)
   );
 
   const [expandedGroups, setExpandedGroups] = useState({});
@@ -45,7 +45,7 @@ const InitiativeList = () => {
           <li
             key={char.id}
             className={`p-2 rounded ${
-              char.index === currentTurn
+              char.id === currentTurnId
                 ? "bg-emerald-700 text-white font-bold"
                 : "bg-gray-800"
             }`}
@@ -58,7 +58,7 @@ const InitiativeList = () => {
         {/* Render grouped characters */}
         {sortedGrouped.map(([groupName, members]) => {
           const isExpanded = expandedGroups[groupName];
-          const isGroupTurn = members.some((m) => m.index === currentTurn);
+          const isGroupTurn = members.some((m) => m.id === currentTurnId);
           const groupInit = members[0]?.initiative ?? 0;
 
           return (
@@ -80,7 +80,7 @@ const InitiativeList = () => {
                     <li
                       key={char.id}
                       className={`p-1 rounded ${
-                        char.index === currentTurn
+                        char.id === currentTurnId
                           ? "bg-emerald-700 text-white font-bold"
                           : "bg-gray-700"
                       }`}

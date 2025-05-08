@@ -5,7 +5,7 @@ const CombatContext = createContext();
 
 export const CombatProvider = ({ children }) => {
   const [characters, setCharacters] = useState([]);
-  const [currentTurn, setCurrentTurn] = useState(0);
+  const [currentTurnId, setCurrentTurnId] = useState(null);
   const [round, setRound] = useState(1);
   const [selectedCharacterId, setSelectedCharacterId] = useState(null);
   const [gridConfig, setGridConfig] = useState({ rows: 20, cols: 20, squareSize: 40 });
@@ -21,7 +21,11 @@ export const CombatProvider = ({ children }) => {
       concentration: null,
       defeated: false,
     };
-    setCharacters((prev) => [...prev, newChar]);
+    setCharacters((prev) => {
+      const updated = [...prev, newChar];
+      if (updated.length === 1) setCurrentTurnId(newChar.id);
+      return updated;
+    });
   };
 
   const updateCharacterPosition = (id, position) => {
@@ -89,21 +93,22 @@ export const CombatProvider = ({ children }) => {
 
   const removeCharacter = (id) => {
     setCharacters((prev) => prev.filter((char) => char.id !== id));
+    if (currentTurnId === id) {
+      setCurrentTurnId(null);
+    }
   };
 
   const nextTurn = () => {
-    const activeChars = characters.filter((c) => !c.defeated);
-    if (activeChars.length === 0) return;
+    const active = characters.filter((c) => !c.defeated);
+    const sorted = [...active].sort((a, b) => b.initiative - a.initiative);
 
-    const sorted = [...activeChars].sort((a, b) => b.initiative - a.initiative);
-    let nextIndex = (currentTurn + 1) % sorted.length;
-    let nextId = sorted[nextIndex]?.id;
-    const actualSortedIndex = sorted.findIndex((c) => c.id === nextId);
+    if (!sorted.length) return;
 
-    setCurrentTurn(actualSortedIndex);
-    if (actualSortedIndex === 0) {
-      setRound((r) => r + 1);
-    }
+    const currentIndex = sorted.findIndex((c) => c.id === currentTurnId);
+    const nextIndex = (currentIndex + 1) % sorted.length;
+    const nextChar = sorted[nextIndex];
+    setCurrentTurnId(nextChar.id);
+    if (nextIndex === 0) setRound((r) => r + 1);
 
     setCharacters((prev) =>
       prev.map((char) => {
@@ -145,7 +150,7 @@ export const CombatProvider = ({ children }) => {
         markDefeated,
         removeCharacter,
         nextTurn,
-        currentTurn,
+        currentTurnId,
         round,
         gridConfig,
         setGridConfig,

@@ -16,7 +16,10 @@ const CharacterPanel = () => {
 
   return (
     <Draggable handle=".handle">
-      <div className="z-50 fixed left-1/2 top-1/4 transform -translate-x-1/2 bg-gray-800 text-white p-4 rounded shadow-lg max-w-sm w-full">
+      <div
+        className="z-50 bg-gray-800 text-white p-4 rounded shadow-lg max-w-sm w-full"
+        style={{ position: "absolute", top: 100, left: 100 }}
+      >
         <div className="handle cursor-move mb-2">
           <h2 className="text-xl font-semibold">{name}</h2>
         </div>

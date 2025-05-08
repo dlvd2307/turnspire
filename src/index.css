@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Pirata+One&display=swap');
+
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, sans-serif;
+  background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+  background-color: #1c1c1c;
+  background-repeat: repeat;
+  background-size: auto;
+  color: #f1f1f1;
+}
+
+h1 {
+  font-family: 'Pirata One', cursive;
+  color: #fbbf24;
+  text-shadow: 2px 2px 4px #000;
+  letter-spacing: 1px;
+}
+
+
+/* Overlay panel background for contrast */
+.bg-overlay {
+  background-color: rgba(24, 24, 27, 0.85); /* slate-900 with transparency */
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+/* Optional: override Tailwind panel if needed */
+.bg-gray-800 {
+  background-color: rgba(55, 65, 81, 0.85) !important;
+}

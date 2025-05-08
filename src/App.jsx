@@ -10,6 +10,7 @@ import SpellMarkerForm from "./components/SpellMarkerForm";
 import StatusOverview from "./components/StatusOverview";
 import { useCombat } from "./context/CombatContext";
 import { useRef, useState, useEffect } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import "./index.css";
 
 const App = () => {
@@ -159,6 +160,9 @@ const App = () => {
           </a>.
         </p>
       </footer>
+
+      {/* Vercel Analytics */}
+      <Analytics />
     </div>
   );
 };

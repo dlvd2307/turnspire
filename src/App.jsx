@@ -33,6 +33,22 @@ const App = () => {
     setLastAutosave(formatted);
   }, [characters, spellMarkers, round]);
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://storage.ko-fi.com/cdn/scripts/overlay-widget.js";
+    script.onload = () => {
+      if (window.kofiWidgetOverlay) {
+        window.kofiWidgetOverlay.draw('dlvd2307', {
+          type: 'floating-chat',
+          'floating-chat.donateButton.text': 'Buy me a potion',
+          'floating-chat.donateButton.background-color': '#00b9fe',
+          'floating-chat.donateButton.text-color': '#fff'
+        });
+      }
+    };
+    document.body.appendChild(script);
+  }, []);
+
   const handleSave = () => {
     const filename = prompt("Name this scenario:", "my_encounter") || "turnspire_scenario";
     const data = {
@@ -143,23 +159,6 @@ const App = () => {
           </a>.
         </p>
       </footer>
-
-      {/* Ko-fi Floating Button */}
-      <div
-        dangerouslySetInnerHTML={{
-          __html: `
-          <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
-          <script>
-            kofiWidgetOverlay.draw('dlvd2307', {
-              'type': 'floating-chat',
-              'floating-chat.donateButton.text': 'Buy me a potion',
-              'floating-chat.donateButton.background-color': '#00b9fe',
-              'floating-chat.donateButton.text-color': '#fff'
-            });
-          </script>
-        `,
-        }}
-      />
     </div>
   );
 };

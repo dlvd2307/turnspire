@@ -8,6 +8,7 @@ import TokenBoard from "./components/TokenBoard";
 import ScenarioLibrary from "./components/ScenarioLibrary";
 import SpellMarkerForm from "./components/SpellMarkerForm";
 import StatusOverview from "./components/StatusOverview";
+import HelpPopup from "./components/HelpPopup";
 import { useCombat } from "./context/CombatContext";
 import { useRef, useState, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
@@ -27,6 +28,7 @@ const App = () => {
 
   const fileInputRef = useRef();
   const [lastAutosave, setLastAutosave] = useState(null);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   useEffect(() => {
     const now = new Date();
@@ -160,6 +162,16 @@ const App = () => {
           </a>.
         </p>
       </footer>
+
+      {/* Help Button and Popup */}
+      <button
+        onClick={() => setIsHelpOpen(true)}
+        className="fixed bottom-4 right-4 bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-3 py-2 rounded-full shadow-lg"
+        title="Help"
+      >
+        ?
+      </button>
+      <HelpPopup isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
 
       {/* Vercel Analytics */}
       <Analytics />

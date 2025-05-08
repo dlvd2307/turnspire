@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.2",
     "@vercel/analytics": "^1.5.0",
     "konva": "^9.3.20",
+    "lucide-react": "^0.508.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-draggable": "^4.4.6",

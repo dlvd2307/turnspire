@@ -7,6 +7,7 @@ import CharacterPanel from "./components/CharacterPanel";
 import TokenBoard from "./components/TokenBoard";
 import ScenarioLibrary from "./components/ScenarioLibrary";
 import SpellMarkerForm from "./components/SpellMarkerForm";
+import StatusOverview from "./components/StatusOverview";
 import { useCombat } from "./context/CombatContext";
 import { useRef, useState, useEffect } from "react";
 import "./index.css";
@@ -21,7 +22,6 @@ const App = () => {
     setSelectedCharacterId,
     spellMarkers,
     setSpellMarkers,
-    undoLastChange,
   } = useCombat();
 
   const fileInputRef = useRef();
@@ -83,7 +83,7 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen text-white px-4 py-6">
+    <div className="min-h-screen bg-gray-900 text-white px-4 py-6">
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div className="flex items-center gap-2 mb-2 sm:mb-0 relative">
           <button
@@ -91,12 +91,6 @@ const App = () => {
             className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-2 rounded text-sm z-10"
           >
             Save
-          </button>
-          <button
-            onClick={undoLastChange}
-            className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded text-sm z-10"
-          >
-            Undo
           </button>
           <input
             ref={fileInputRef}
@@ -107,41 +101,65 @@ const App = () => {
           />
         </div>
         <h1 className="text-3xl font-bold text-center sm:flex-grow sm:-ml-20">Turnspire</h1>
-        <div className="text-sm text-gray-200 mt-2 sm:mt-0 sm:text-right sm:w-40">
+        <div className="text-sm text-gray-400 mt-2 sm:mt-0 sm:text-right sm:w-40">
           {lastAutosave && `Last autosave: ${lastAutosave}`}
         </div>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3 space-y-4">
-          <div className="bg-overlay">
-            <ScenarioLibrary />
-            <CharacterForm />
-            <EnemyForm />
-            <SpellMarkerForm />
-          </div>
+        <div className="lg:col-span-3">
+          <ScenarioLibrary />
+          <CharacterForm />
+          <EnemyForm />
+          <SpellMarkerForm />
           <TokenBoard />
         </div>
-
-        <div className="lg:col-span-2 space-y-4">
-          <div className="bg-overlay">
-            <InitiativeList />
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Round: {round}</h2>
-              <button
-                onClick={nextTurn}
-                className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white"
-              >
-                Next Turn
-              </button>
-            </div>
-            <ConditionManager />
-            <ConcentrationManager />
+        <div className="lg:col-span-2">
+          <InitiativeList />
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Round: {round}</h2>
+            <button
+              onClick={nextTurn}
+              className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white"
+            >
+              Next Turn
+            </button>
           </div>
+          <ConditionManager />
+          <ConcentrationManager />
+          <StatusOverview />
         </div>
       </div>
 
       <CharacterPanel />
+
+      {/* Footer Message */}
+      <footer className="mt-10 text-center text-sm text-gray-400">
+        <p>Thank you for using Turnspire.</p>
+        <p>
+          If you have questions, ideas, or need help, email me at{" "}
+          <a href="mailto:turnspire@gmail.com" className="text-blue-400 underline">
+            turnspire@gmail.com
+          </a>.
+        </p>
+      </footer>
+
+      {/* Ko-fi Floating Button */}
+      <div
+        dangerouslySetInnerHTML={{
+          __html: `
+          <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+          <script>
+            kofiWidgetOverlay.draw('dlvd2307', {
+              'type': 'floating-chat',
+              'floating-chat.donateButton.text': 'Buy me a potion',
+              'floating-chat.donateButton.background-color': '#00b9fe',
+              'floating-chat.donateButton.text-color': '#fff'
+            });
+          </script>
+        `,
+        }}
+      />
     </div>
   );
 };

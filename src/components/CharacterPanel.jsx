@@ -9,20 +9,21 @@ const CharacterPanel = () => {
     markDefeated,
     removeCharacter,
     updateCharacterHP,
+    updateCharacterAC,
   } = useCombat();
 
   const selectedCharacter = characters.find((char) => char.id === selectedCharacterId);
   if (!selectedCharacter) return null;
 
-  const { name, hp, maxHp, type, conditions, concentration, defeated } = selectedCharacter;
+  const { id, name, hp, maxHp, ac, type, conditions, concentration, defeated } = selectedCharacter;
 
   const handleRemove = () => {
     const confirmed = confirm(`Remove ${name} from the board?`);
-    if (confirmed) removeCharacter(selectedCharacter.id);
+    if (confirmed) removeCharacter(id);
   };
 
   const handleDefeat = () => {
-    if (!defeated) markDefeated(selectedCharacter.id);
+    if (!defeated) markDefeated(id);
   };
 
   return (
@@ -54,12 +55,20 @@ const CharacterPanel = () => {
         <input
           type="number"
           value={hp}
-          onChange={(e) =>
-            updateCharacterHP(selectedCharacter.id, parseInt(e.target.value) || 0)
-          }
+          onChange={(e) => updateCharacterHP(id, parseInt(e.target.value) || 0)}
           className="ml-2 w-16 text-black px-1 rounded"
         />
         {" "} / {maxHp}
+      </p>
+
+      <p>
+        AC:{" "}
+        <input
+          type="number"
+          value={ac || ""}
+          onChange={(e) => updateCharacterAC(id, parseInt(e.target.value) || 0)}
+          className="ml-2 w-16 text-black px-1 rounded"
+        />
       </p>
 
       <p>Type: {type === "enemy" ? "Enemy" : "Character"}</p>
@@ -76,7 +85,7 @@ const CharacterPanel = () => {
                 <span>{cond.name} ({cond.remainingRounds} round{cond.remainingRounds > 1 ? "s" : ""})</span>
                 <button
                   className="text-red-400 hover:text-red-600 ml-2"
-                  onClick={() => removeCondition(selectedCharacter.id, cond.name)}
+                  onClick={() => removeCondition(id, cond.name)}
                 >
                   ❌
                 </button>
@@ -93,7 +102,7 @@ const CharacterPanel = () => {
             <span>{concentration.spell} ({concentration.remainingRounds} round{concentration.remainingRounds > 1 ? "s" : ""})</span>
             <button
               className="text-red-400 hover:text-red-600 ml-2"
-              onClick={() => clearConcentration(selectedCharacter.id)}
+              onClick={() => clearConcentration(id)}
             >
               ❌
             </button>

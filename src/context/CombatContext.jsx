@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 const CombatContext = createContext();
@@ -11,6 +11,46 @@ export const CombatProvider = ({ children }) => {
   const [gridConfig, setGridConfig] = useState({ rows: 20, cols: 20, squareSize: 40 });
   const [spellMarkers, setSpellMarkers] = useState([]);
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
+  const [history, setHistory] = useState([]);
+
+  const saveHistory = () => {
+    setHistory((prev) => [
+      ...prev.slice(-19),
+      {
+        characters: JSON.parse(JSON.stringify(characters)),
+        round,
+        currentTurnId,
+        spellMarkers: JSON.parse(JSON.stringify(spellMarkers)),
+      },
+    ]);
+  };
+
+  const undo = () => {
+    if (history.length === 0) return;
+    const last = history[history.length - 1];
+    setCharacters(last.characters);
+    setRound(last.round);
+    setCurrentTurnId(last.currentTurnId);
+    setSpellMarkers(last.spellMarkers);
+    setHistory((prev) => prev.slice(0, -1));
+  };
+
+  useEffect(() => {
+    const handleUndo = (e) => {
+      const isInputFocused = ["INPUT", "TEXTAREA"].includes(document.activeElement.tagName);
+      if (isInputFocused) return;
+      if (e.type === "undo-action" || (e.ctrlKey && e.key === "z")) {
+        e.preventDefault();
+        undo();
+      }
+    };
+    window.addEventListener("undo-action", handleUndo);
+    window.addEventListener("keydown", handleUndo);
+    return () => {
+      window.removeEventListener("undo-action", handleUndo);
+      window.removeEventListener("keydown", handleUndo);
+    };
+  }, [history]);
 
   const addCharacter = (char) => {
     const newChar = {
@@ -29,12 +69,14 @@ export const CombatProvider = ({ children }) => {
   };
 
   const updateCharacterPosition = (id, position) => {
+    saveHistory();
     setCharacters((prev) =>
       prev.map((char) => (char.id === id ? { ...char, position } : char))
     );
   };
 
   const updateCharacterHP = (id, newHP) => {
+    saveHistory();
     setCharacters((prev) =>
       prev.map((char) =>
         char.id === id ? { ...char, hp: Math.max(0, Math.min(newHP, char.maxHp)) } : char
@@ -47,6 +89,7 @@ export const CombatProvider = ({ children }) => {
   };
 
   const applyCondition = (id, condition) => {
+    saveHistory();
     setCharacters((prev) =>
       prev.map((char) =>
         char.id === id
@@ -57,14 +100,14 @@ export const CombatProvider = ({ children }) => {
   };
 
   const applyConcentration = (id, spell) => {
+    saveHistory();
     setCharacters((prev) =>
-      prev.map((char) =>
-        char.id === id ? { ...char, concentration: spell } : char
-      )
+      prev.map((char) => (char.id === id ? { ...char, concentration: spell } : char))
     );
   };
 
   const removeCondition = (id, conditionName) => {
+    saveHistory();
     setCharacters((prev) =>
       prev.map((char) =>
         char.id === id
@@ -78,20 +121,21 @@ export const CombatProvider = ({ children }) => {
   };
 
   const clearConcentration = (id) => {
+    saveHistory();
     setCharacters((prev) =>
-      prev.map((char) =>
-        char.id === id ? { ...char, concentration: null } : char
-      )
+      prev.map((char) => (char.id === id ? { ...char, concentration: null } : char))
     );
   };
 
   const markDefeated = (id) => {
+    saveHistory();
     setCharacters((prev) =>
       prev.map((char) => (char.id === id ? { ...char, defeated: true } : char))
     );
   };
 
   const removeCharacter = (id) => {
+    saveHistory();
     setCharacters((prev) => prev.filter((char) => char.id !== id));
     if (currentTurnId === id) {
       setCurrentTurnId(null);
@@ -108,29 +152,33 @@ export const CombatProvider = ({ children }) => {
     const nextIndex = (currentIndex + 1) % sorted.length;
     const nextChar = sorted[nextIndex];
     setCurrentTurnId(nextChar.id);
-    if (nextIndex === 0) setRound((r) => r + 1);
 
-    setCharacters((prev) =>
-      prev.map((char) => {
-        const newConditions = char.conditions
-          .map((c) => ({ ...c, remainingRounds: c.remainingRounds - 1 }))
-          .filter((c) => c.remainingRounds > 0);
+    const isNewRound = nextIndex === 0;
+    if (isNewRound) {
+      setRound((r) => r + 1);
+      saveHistory();
+      setCharacters((prev) =>
+        prev.map((char) => {
+          const newConditions = char.conditions
+            .map((c) => ({ ...c, remainingRounds: c.remainingRounds - 1 }))
+            .filter((c) => c.remainingRounds > 0);
 
-        const newConcentration =
-          char.concentration && char.concentration.remainingRounds > 1
-            ? {
-                ...char.concentration,
-                remainingRounds: char.concentration.remainingRounds - 1,
-              }
-            : null;
+          const newConcentration =
+            char.concentration && char.concentration.remainingRounds > 1
+              ? {
+                  ...char.concentration,
+                  remainingRounds: char.concentration.remainingRounds - 1,
+                }
+              : null;
 
-        return {
-          ...char,
-          conditions: newConditions,
-          concentration: newConcentration,
-        };
-      })
-    );
+          return {
+            ...char,
+            conditions: newConditions,
+            concentration: newConcentration,
+          };
+        })
+      );
+    }
   };
 
   return (
@@ -158,6 +206,7 @@ export const CombatProvider = ({ children }) => {
         setSpellMarkers,
         selectedMarkerId,
         setSelectedMarkerId,
+        undo,
       }}
     >
       {children}

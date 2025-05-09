@@ -1,3 +1,4 @@
+// src/App.jsx
 import CharacterForm from "./components/CharacterForm";
 import EnemyForm from "./components/EnemyForm";
 import InitiativeList from "./components/InitiativeList";
@@ -9,7 +10,7 @@ import ScenarioLibrary from "./components/ScenarioLibrary";
 import SpellMarkerForm from "./components/SpellMarkerForm";
 import StatusOverview from "./components/StatusOverview";
 import HelpPopup from "./components/HelpPopup";
-import GridSettings from "./components/GridSettings"; // ✅ Added
+import GridSettings from "./components/GridSettings";
 import { useCombat } from "./context/CombatContext";
 import { useRef, useState, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
@@ -129,23 +130,33 @@ const App = () => {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3">
           <ScenarioLibrary />
-          <GridSettings /> {/* ✅ Restored here */}
           <CharacterForm />
           <EnemyForm />
           <SpellMarkerForm />
           <TokenBoard />
+          <GridSettings />
         </div>
         <div className="lg:col-span-2">
           <InitiativeList />
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Round: {round}</h2>
-            <button
-              onClick={nextTurn}
-              className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white"
-            >
-              Next Turn
-            </button>
-          </div>
+        <div className="flex justify-between items-center mb-4 space-x-2">
+  <h2 className="text-lg font-semibold">Round: {round}</h2>
+  <div className="flex space-x-2">
+    <button
+      onClick={() => window.dispatchEvent(new Event("undo-action"))}
+      className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-white"
+      title="Undo last action"
+    >
+      Undo
+    </button>
+    <button
+      onClick={nextTurn}
+      className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white"
+    >
+      Next Turn
+    </button>
+  </div>
+</div>
+
           <ConditionManager />
           <ConcentrationManager />
           <StatusOverview />

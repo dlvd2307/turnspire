@@ -56,6 +56,7 @@ const TokenBoard = () => {
   return (
     <div className="mx-auto mb-6 border border-gray-700 rounded overflow-hidden">
       <Stage width={width} height={height} draggable style={{ backgroundColor: "#1F2937" }}>
+        {/* Grid */}
         <Layer>
           {Array.from({ length: rows }).map((_, row) =>
             Array.from({ length: cols }).map((_, col) => (
@@ -71,6 +72,7 @@ const TokenBoard = () => {
           )}
         </Layer>
 
+        {/* Spell Markers */}
         <Layer>
           {spellMarkers.map((m) => {
             const sizePx = m.squares * squareSize;
@@ -134,6 +136,7 @@ const TokenBoard = () => {
                     strokeWidth={2}
                   />
                 )}
+
                 <Text
                   text={m.label}
                   fontSize={12}
@@ -143,12 +146,31 @@ const TokenBoard = () => {
                   y={sizePx + 2}
                   width={sizePx}
                 />
+
+                <Text
+                  text="✖"
+                  fontSize={14}
+                  fill="#f87171"
+                  x={sizePx - 14}
+                  y={-6}
+                  width={12}
+                  height={12}
+                  onClick={() => {
+                    const confirmed = confirm("Remove this spell marker?");
+                    if (confirmed) {
+                      setSpellMarkers((prev) => prev.filter((marker) => marker.id !== m.id));
+                      setSelectedMarkerId(null);
+                    }
+                  }}
+                  style={{ cursor: "pointer" }}
+                />
               </Group>
             );
           })}
           <Transformer ref={transformerRef} rotateEnabled={true} enabledAnchors={[]} />
         </Layer>
 
+        {/* Character Tokens */}
         <Layer>
           {characters.map((char) => {
             const { hp = 100, maxHp = 100 } = char;
@@ -241,7 +263,6 @@ const TokenBoard = () => {
                   x={0}
                   y={squareSize + 2}
                   width={squareSize}
-                  height={squareSize}
                 />
 
                 <Text
@@ -252,8 +273,19 @@ const TokenBoard = () => {
                   x={0}
                   y={squareSize + 14}
                   width={squareSize}
-                  height={squareSize}
                 />
+
+                {char.ac !== undefined && (
+                  <Text
+                    text={`AC: ${char.ac}`}
+                    fontSize={10}
+                    fill={isDefeated ? "#9CA3AF" : "#FBBF24"}
+                    align="center"
+                    x={0}
+                    y={squareSize + 26}
+                    width={squareSize}
+                  />
+                )}
               </Group>
             );
           })}

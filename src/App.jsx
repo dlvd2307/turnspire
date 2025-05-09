@@ -39,19 +39,35 @@ const App = () => {
   }, [characters, spellMarkers, round]);
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://storage.ko-fi.com/cdn/scripts/overlay-widget.js";
-    script.onload = () => {
-      if (window.kofiWidgetOverlay) {
-        window.kofiWidgetOverlay.draw('dlvd2307', {
-          type: 'floating-chat',
-          'floating-chat.donateButton.text': 'Buy me a potion',
-          'floating-chat.donateButton.background-color': '#00b9fe',
-          'floating-chat.donateButton.text-color': '#fff'
-        });
-      }
-    };
-    document.body.appendChild(script);
+  if (document.getElementById("kofi-script")) return; // Prevent duplicates
+
+  const script = document.createElement("script");
+  script.src = "https://storage.ko-fi.com/cdn/scripts/overlay-widget.js";
+  script.id = "kofi-script";
+  script.async = true;
+
+  script.onload = () => {
+    if (window.kofiWidgetOverlay) {
+      window.kofiWidgetOverlay.draw("dlvd2307", {
+        type: "floating-chat",
+        "floating-chat.donateButton.text": "Buy me a potion",
+        "floating-chat.donateButton.background-color": "#00b9fe",
+        "floating-chat.donateButton.text-color": "#fff",
+      });
+    }
+  };
+
+  document.body.appendChild(script);
+}, []);
+
+
+  // 👇 Auto-open Help on first visit
+  useEffect(() => {
+    const hasSeenHelp = localStorage.getItem("hasSeenHelp");
+    if (!hasSeenHelp) {
+      setIsHelpOpen(true);
+      localStorage.setItem("hasSeenHelp", "true");
+    }
   }, []);
 
   const handleSave = () => {
@@ -138,25 +154,24 @@ const App = () => {
         </div>
         <div className="lg:col-span-2">
           <InitiativeList />
-        <div className="flex justify-between items-center mb-4 space-x-2">
-  <h2 className="text-lg font-semibold">Round: {round}</h2>
-  <div className="flex space-x-2">
-    <button
-      onClick={() => window.dispatchEvent(new Event("undo-action"))}
-      className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-white"
-      title="Undo last action"
-    >
-      Undo
-    </button>
-    <button
-      onClick={nextTurn}
-      className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white"
-    >
-      Next Turn
-    </button>
-  </div>
-</div>
-
+          <div className="flex justify-between items-center mb-4 space-x-2">
+            <h2 className="text-lg font-semibold">Round: {round}</h2>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => window.dispatchEvent(new Event("undo-action"))}
+                className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-white"
+                title="Undo last action"
+              >
+                Undo
+              </button>
+              <button
+                onClick={nextTurn}
+                className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white"
+              >
+                Next Turn
+              </button>
+            </div>
+          </div>
           <ConditionManager />
           <ConcentrationManager />
           <StatusOverview />
@@ -182,7 +197,6 @@ const App = () => {
         ?
       </button>
       <HelpPopup isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
-
       <Analytics />
     </div>
   );

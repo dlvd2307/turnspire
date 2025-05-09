@@ -1,3 +1,4 @@
+// src/components/CharacterPanel.jsx
 import { useCombat } from "../context/CombatContext";
 
 const CharacterPanel = () => {
@@ -65,8 +66,16 @@ const CharacterPanel = () => {
         AC:{" "}
         <input
           type="number"
-          value={ac || ""}
-          onChange={(e) => updateCharacterAC(id, parseInt(e.target.value) || 0)}
+          value={ac ?? ""}
+          onChange={(e) => {
+            const val = e.target.value;
+            const parsed = parseInt(val);
+            if (!isNaN(parsed)) {
+              updateCharacterAC(id, parsed);
+            } else if (val === "") {
+              updateCharacterAC(id, 0);
+            }
+          }}
           className="ml-2 w-16 text-black px-1 rounded"
         />
       </p>

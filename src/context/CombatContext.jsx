@@ -84,6 +84,15 @@ export const CombatProvider = ({ children }) => {
     );
   };
 
+const updateCharacterAC = (id, newAC) => {
+  saveHistory();
+  setCharacters((prev) =>
+    prev.map((char) =>
+      char.id === id ? { ...char, ac: Math.max(0, parseInt(newAC) || 0) } : char
+    )
+  );
+};
+
   const selectCharacter = (id) => {
     setSelectedCharacterId(id);
   };
@@ -207,6 +216,8 @@ export const CombatProvider = ({ children }) => {
         selectedMarkerId,
         setSelectedMarkerId,
         undo,
+        updateCharacterAC,
+
       }}
     >
       {children}

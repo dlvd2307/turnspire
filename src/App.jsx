@@ -26,6 +26,7 @@ const App = () => {
     setSelectedCharacterId,
     spellMarkers,
     setSpellMarkers,
+    gridConfig,
   } = useCombat();
 
   const fileInputRef = useRef();
@@ -71,38 +72,42 @@ const App = () => {
   }, []);
 
 const handleSave = () => {
-  const input = prompt("Name this scenario:", "my_encounter");
-  if (input === null) return; // Cancel clicked
-
-  const filename = input.trim() !== "" ? input.trim() : "turnspire_scenario";
-
-  const data = {
-    characters,
-    round,
-    currentTurn: characters.findIndex(c => !c.defeated),
-    gridConfig,
-    spellMarkers,
-  };
-
   try {
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: "application/json",
-    });
+    const filename = prompt("Name this scenario:", "my_encounter");
 
-    const url = window.URL.createObjectURL(blob);
+    if (!filename) {
+      console.log("Save cancelled by user.");
+      return;
+    }
+
+    const data = {
+      characters,
+      round,
+      currentTurn: characters.findIndex(c => !c.defeated),
+      gridConfig,
+      spellMarkers,
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+
     const a = document.createElement("a");
-    a.href = url;
+    a.href = URL.createObjectURL(blob);
     a.download = `${filename}.json`;
-    a.style.display = "none";
-
     document.body.appendChild(a);
+
+    console.log("Triggering download...");
     a.click();
 
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    // Give browser time to process click
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+      console.log("Download completed and cleaned up.");
+    }, 100);
   } catch (error) {
-    alert("Failed to save file.");
-    console.error("Save error:", error);
+    console.error("Error during save:", error);
+    alert("Failed to save scenario. Check the console for details.");
   }
 };
 

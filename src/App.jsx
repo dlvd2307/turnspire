@@ -70,30 +70,43 @@ const App = () => {
     }
   }, []);
 
-  const handleSave = () => {
-    const filename = prompt("Name this scenario:", "my_encounter") || "turnspire_scenario";
-    const data = {
-      characters,
-      round,
-      currentTurn: characters.findIndex(c => !c.defeated),
-      gridConfig: {
-        rows: 20,
-        cols: 20,
-        squareSize: 40,
-      },
-      spellMarkers,
-    };
+const handleSave = () => {
+  const input = prompt("Name this scenario:", "my_encounter");
+  if (input === null) return; // Cancel clicked
+
+  const filename = input.trim() !== "" ? input.trim() : "turnspire_scenario";
+
+  const data = {
+    characters,
+    round,
+    currentTurn: characters.findIndex(c => !c.defeated),
+    gridConfig,
+    spellMarkers,
+  };
+
+  try {
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
     });
-    const url = URL.createObjectURL(blob);
+
+    const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = `${filename}.json`;
+    a.style.display = "none";
+
     document.body.appendChild(a);
     a.click();
+
     document.body.removeChild(a);
-  };
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    alert("Failed to save file.");
+    console.error("Save error:", error);
+  }
+};
+
+
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];

@@ -255,37 +255,43 @@ const TokenBoard = () => {
                   height={squareSize}
                 />
 
-                <Text
-                  text={char.name}
-                  fontSize={12}
-                  fill={isDefeated ? "#9CA3AF" : "white"}
-                  align="center"
-                  x={0}
-                  y={squareSize + 2}
-                  width={squareSize}
-                />
+<Text
+  text={char.name.length > 18 ? char.name.slice(0, 17) + "…" : char.name}
+  fontSize={12}
+  fill={isDefeated ? "#9CA3AF" : "white"}
+  align="center"
+  verticalAlign="middle"
+  x={-squareSize / 2}
+  y={squareSize + 4}
+  width={squareSize * 2}
+  height={14}
+/>
 
-                <Text
-                  text={`${char.hp} / ${char.maxHp}`}
-                  fontSize={10}
-                  fill={isDefeated ? "#9CA3AF" : "#D1D5DB"}
-                  align="center"
-                  x={0}
-                  y={squareSize + 14}
-                  width={squareSize}
-                />
 
-                {char.ac !== undefined && (
-                  <Text
-                    text={`AC: ${char.ac}`}
-                    fontSize={10}
-                    fill={isDefeated ? "#9CA3AF" : "#FBBF24"}
-                    align="center"
-                    x={0}
-                    y={squareSize + 26}
-                    width={squareSize}
-                  />
-                )}
+
+<Text
+  text={`${char.hp} / ${char.maxHp}`}
+  fontSize={10}
+  fill={isDefeated ? "#9CA3AF" : "#D1D5DB"}
+  align="center"
+  x={0}
+  y={squareSize + 20}
+  width={squareSize}
+  height={14}
+/>
+{char.ac !== undefined && (
+  <Text
+    text={`AC: ${char.ac}`}
+    fontSize={10}
+    fill={isDefeated ? "#9CA3AF" : "#FBBF24"}
+    align="center"
+    x={0}
+    y={squareSize + 34}
+    width={squareSize}
+    height={14}
+/>
+)}
+
               </Group>
             );
           })}

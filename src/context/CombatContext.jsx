@@ -6,7 +6,7 @@ const CombatContext = createContext();
 export const CombatProvider = ({ children }) => {
   const [characters, setCharacters] = useState([]);
   const [currentTurnId, setCurrentTurnId] = useState(null);
-  const [round, setRound] = useState(1);
+  const [round, setRound] = useState(0);
   const [selectedCharacterId, setSelectedCharacterId] = useState(null);
   const [gridConfig, setGridConfig] = useState({ rows: 20, cols: 20, squareSize: 40 });
   const [spellMarkers, setSpellMarkers] = useState([]);

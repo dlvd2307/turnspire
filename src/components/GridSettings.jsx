@@ -7,7 +7,8 @@ const GridSettings = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const update = (field, value) => {
-    setGridConfig({ ...gridConfig, [field]: parseInt(value) });
+    const parsed = field === "backgroundType" ? value : parseInt(value);
+    setGridConfig({ ...gridConfig, [field]: parsed });
   };
 
   return (
@@ -49,6 +50,20 @@ const GridSettings = () => {
                 onChange={(e) => update("squareSize", e.target.value)}
                 className="w-24 p-2 bg-gray-700 text-white rounded"
               />
+            </label>
+            <label className="flex items-center gap-2">
+              <span>Background:</span>
+              <select
+                value={gridConfig.backgroundType}
+                onChange={(e) => update("backgroundType", e.target.value)}
+                className="px-2 py-1 bg-gray-700 text-white rounded"
+              >
+                <option value="none">None</option>
+                <option value="grass">Grass</option>
+                <option value="desert">Desert</option>
+                <option value="dungeon">Dungeon</option>
+                <option value="snow">Snow</option>
+              </select>
             </label>
           </div>
         </div>

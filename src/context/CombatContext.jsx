@@ -8,7 +8,12 @@ export const CombatProvider = ({ children }) => {
   const [currentTurnId, setCurrentTurnId] = useState(null);
   const [round, setRound] = useState(0);
   const [selectedCharacterId, setSelectedCharacterId] = useState(null);
-  const [gridConfig, setGridConfig] = useState({ rows: 20, cols: 20, squareSize: 40 });
+  const [gridConfig, setGridConfig] = useState({
+  rows: 20,
+  cols: 20,
+  squareSize: 40,
+  backgroundType: "grass.png"
+});
   const [spellMarkers, setSpellMarkers] = useState([]);
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
   const [history, setHistory] = useState([]);

@@ -1,6 +1,14 @@
-import { Stage, Layer, Rect, Text, Group, Circle, Line, Transformer } from "react-konva";
+import { Stage, Layer, Rect, Text, Group, Circle, Line, Transformer, Image as KonvaImage } from "react-konva";
 import { useCombat } from "../context/CombatContext";
 import { useRef, useEffect } from "react";
+import useImage from "use-image";
+
+const terrainMap = {
+  grass: "/assets/backgrounds/grass.png",
+  desert: "/assets/backgrounds/desert.png",
+  dungeon: "/assets/backgrounds/dungeon.png",
+  snow: "/assets/backgrounds/snow.png",
+};
 
 const TokenBoard = () => {
   const {
@@ -9,6 +17,7 @@ const TokenBoard = () => {
     updateCharacterPosition,
     selectCharacter,
     selectedCharacterId,
+    currentTurnId,
     spellMarkers,
     setSpellMarkers,
     selectedMarkerId,
@@ -16,10 +25,11 @@ const TokenBoard = () => {
     markDefeated,
   } = useCombat();
 
-  const { rows, cols, squareSize } = gridConfig;
+  const { rows, cols, squareSize, backgroundType } = gridConfig;
   const width = cols * squareSize;
   const height = rows * squareSize;
 
+  const [bgImage] = useImage(backgroundType && backgroundType !== "none" ? terrainMap[backgroundType] : null);
   const transformerRef = useRef();
   const shapeRefs = useRef({});
 
@@ -56,7 +66,19 @@ const TokenBoard = () => {
   return (
     <div className="mx-auto mb-6 border border-gray-700 rounded overflow-hidden">
       <Stage width={width} height={height} draggable style={{ backgroundColor: "#1F2937" }}>
-        {/* Grid */}
+        <Layer>
+          {bgImage && (
+            <KonvaImage
+              image={bgImage}
+              x={0}
+              y={0}
+              width={width}
+              height={height}
+              listening={false}
+            />
+          )}
+        </Layer>
+
         <Layer>
           {Array.from({ length: rows }).map((_, row) =>
             Array.from({ length: cols }).map((_, col) => (
@@ -72,7 +94,6 @@ const TokenBoard = () => {
           )}
         </Layer>
 
-        {/* Spell Markers */}
         <Layer>
           {spellMarkers.map((m) => {
             const sizePx = m.squares * squareSize;
@@ -136,7 +157,6 @@ const TokenBoard = () => {
                     strokeWidth={2}
                   />
                 )}
-
                 <Text
                   text={m.label}
                   fontSize={12}
@@ -146,7 +166,6 @@ const TokenBoard = () => {
                   y={sizePx + 2}
                   width={sizePx}
                 />
-
                 <Text
                   text="✖"
                   fontSize={14}
@@ -170,7 +189,6 @@ const TokenBoard = () => {
           <Transformer ref={transformerRef} rotateEnabled={true} enabledAnchors={[]} />
         </Layer>
 
-        {/* Character Tokens */}
         <Layer>
           {characters.map((char) => {
             const { hp = 100, maxHp = 100 } = char;
@@ -178,6 +196,7 @@ const TokenBoard = () => {
             const pos = char.position || { x: 0, y: 0 };
             const isEnemy = char.type === "enemy";
             const isSelected = selectedCharacterId === char.id;
+            const isCurrentTurn = currentTurnId === char.id;
             const isDefeated = char.defeated;
             const hasCondition = char.conditions?.length > 0;
             const hasConcentration = !!char.concentration;
@@ -197,6 +216,33 @@ const TokenBoard = () => {
                   setSelectedMarkerId(null);
                 }}
               >
+                {/* Highlight if it's this character's turn */}
+               {isCurrentTurn && (
+  <Circle
+    x={squareSize / 2}
+    y={squareSize / 2}
+    radius={squareSize / 2 + 12}
+    stroke="#22C55E" // Bright green highlight
+    strokeWidth={3}
+    dash={[3, 3]}
+    listening={false}
+  />
+)}
+
+
+                {/* Highlight if selected */}
+                {isSelected && (
+                  <Circle
+                    x={squareSize / 2}
+                    y={squareSize / 2}
+                    radius={squareSize / 2 + 10}
+                    stroke="#3B82F6"
+                    strokeWidth={2}
+                    dash={[4, 4]}
+                    listening={false}
+                  />
+                )}
+
                 <Rect x={0} y={-10} width={squareSize} height={6} fill="#374151" cornerRadius={2} />
                 <Rect
                   x={0}
@@ -231,13 +277,7 @@ const TokenBoard = () => {
                 <Rect
                   width={squareSize}
                   height={squareSize}
-                  fill={
-                    isDefeated
-                      ? "#4B5563"
-                      : isSelected
-                      ? selectedColor
-                      : baseColor
-                  }
+                  fill={isDefeated ? "#4B5563" : isSelected ? selectedColor : baseColor}
                   cornerRadius={8}
                   stroke="#E5E7EB"
                   strokeWidth={2}
@@ -255,43 +295,41 @@ const TokenBoard = () => {
                   height={squareSize}
                 />
 
-<Text
-  text={char.name.length > 18 ? char.name.slice(0, 17) + "…" : char.name}
-  fontSize={12}
-  fill={isDefeated ? "#9CA3AF" : "white"}
-  align="center"
-  verticalAlign="middle"
-  x={-squareSize / 2}
-  y={squareSize + 4}
-  width={squareSize * 2}
-  height={14}
-/>
+                <Text
+                  text={char.name.length > 18 ? char.name.slice(0, 17) + "…" : char.name}
+                  fontSize={12}
+                  fill={isDefeated ? "#9CA3AF" : "white"}
+                  align="center"
+                  verticalAlign="middle"
+                  x={-squareSize / 2}
+                  y={squareSize + 4}
+                  width={squareSize * 2}
+                  height={14}
+                />
 
+                <Text
+                  text={`${char.hp} / ${char.maxHp}`}
+                  fontSize={10}
+                  fill={isDefeated ? "#9CA3AF" : "#D1D5DB"}
+                  align="center"
+                  x={0}
+                  y={squareSize + 20}
+                  width={squareSize}
+                  height={14}
+                />
 
-
-<Text
-  text={`${char.hp} / ${char.maxHp}`}
-  fontSize={10}
-  fill={isDefeated ? "#9CA3AF" : "#D1D5DB"}
-  align="center"
-  x={0}
-  y={squareSize + 20}
-  width={squareSize}
-  height={14}
-/>
-{char.ac !== undefined && (
-  <Text
-    text={`AC: ${char.ac}`}
-    fontSize={10}
-    fill={isDefeated ? "#9CA3AF" : "#FBBF24"}
-    align="center"
-    x={0}
-    y={squareSize + 34}
-    width={squareSize}
-    height={14}
-/>
-)}
-
+                {char.ac !== undefined && (
+                  <Text
+                    text={`AC: ${char.ac}`}
+                    fontSize={10}
+                    fill={isDefeated ? "#9CA3AF" : "#FBBF24"}
+                    align="center"
+                    x={0}
+                    y={squareSize + 34}
+                    width={squareSize}
+                    height={14}
+                  />
+                )}
               </Group>
             );
           })}

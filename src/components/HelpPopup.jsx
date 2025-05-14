@@ -18,10 +18,16 @@ const HelpPopup = ({ isOpen, onClose }) => {
             <p><strong>🗺️ Use the Grid:</strong> Drag tokens to place them. Blue = PC, Red = Enemy, Gray = Defeated.</p>
             <p><strong>🔄 Turn Order:</strong> Use <span className="bg-green-600 px-1 rounded">Next Turn</span> to rotate through initiative. Rounds increase automatically.</p>
             <p><strong>🧠 Track Effects:</strong> Apply or remove Conditions and Concentration via the panels or character details. Effects expire by round.</p>
+            <p><strong>🧿 Token Highlights:</strong></p>
+            <ul className="list-disc list-inside ml-4">
+              <li><span className="text-green-400">Green Ring:</span> It's this character's turn</li>
+              <li><span className="text-blue-400">Blue Ring:</span> Currently selected character</li>
+              <li><span className="text-yellow-400">Yellow Ring:</span> Character has Conditions or Concentration</li>
+            </ul>
             <p><strong>✨ Spell Markers:</strong> Use the form to add labeled shapes (cube, sphere, cone). Drag, rotate, or delete using the ❌ button.</p>
-            <p><strong>🧮 Grid Settings:</strong> Adjust rows, columns, and square size from the settings panel.</p>
+            <p><strong>🧮 Grid Settings:</strong> Adjust rows, columns, square size, and select a terrain background (grass, desert, dungeon, snow, town, or none).</p>
             <p><strong>💾 Save & Load:</strong> Save your scenario to a file and load it later. Autosave keeps track of changes.</p>
-            <p><strong>↩️ Undo:</strong> Made a mistake? Use the <span className="bg-yellow-600 px-1 rounded">Undo</span> button to roll back your last action.</p>
+            <p><strong>↩️ Undo:</strong> Made a mistake? Use the <span className="bg-yellow-600 px-1 rounded">Undo</span> button or press Ctrl+Z to roll back your last action.</p>
             <p><strong>☕ Support the Project:</strong> Enjoying Turnspire? Click the Ko-fi button to buy me a potion.</p>
             <p><strong>📬 Need Help?</strong> Email <a href="mailto:turnspire@gmail.com" className="text-blue-400 underline">turnspire@gmail.com</a>.</p>
           </div>

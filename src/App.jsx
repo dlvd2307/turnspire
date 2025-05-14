@@ -32,6 +32,7 @@ const App = () => {
   const fileInputRef = useRef();
   const [lastAutosave, setLastAutosave] = useState(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [showRoundBanner, setShowRoundBanner] = useState(false);
 
   useEffect(() => {
     const now = new Date();
@@ -40,29 +41,24 @@ const App = () => {
   }, [characters, spellMarkers, round]);
 
   useEffect(() => {
-  if (document.getElementById("kofi-script")) return; // Prevent duplicates
+    if (document.getElementById("kofi-script")) return;
+    const script = document.createElement("script");
+    script.src = "https://storage.ko-fi.com/cdn/scripts/overlay-widget.js";
+    script.id = "kofi-script";
+    script.async = true;
+    script.onload = () => {
+      if (window.kofiWidgetOverlay) {
+        window.kofiWidgetOverlay.draw("dlvd2307", {
+          type: "floating-chat",
+          "floating-chat.donateButton.text": "Buy me a potion",
+          "floating-chat.donateButton.background-color": "#00b9fe",
+          "floating-chat.donateButton.text-color": "#fff",
+        });
+      }
+    };
+    document.body.appendChild(script);
+  }, []);
 
-  const script = document.createElement("script");
-  script.src = "https://storage.ko-fi.com/cdn/scripts/overlay-widget.js";
-  script.id = "kofi-script";
-  script.async = true;
-
-  script.onload = () => {
-    if (window.kofiWidgetOverlay) {
-      window.kofiWidgetOverlay.draw("dlvd2307", {
-        type: "floating-chat",
-        "floating-chat.donateButton.text": "Buy me a potion",
-        "floating-chat.donateButton.background-color": "#00b9fe",
-        "floating-chat.donateButton.text-color": "#fff",
-      });
-    }
-  };
-
-  document.body.appendChild(script);
-}, []);
-
-
-  // 👇 Auto-open Help on first visit
   useEffect(() => {
     const hasSeenHelp = localStorage.getItem("hasSeenHelp");
     if (!hasSeenHelp) {
@@ -71,52 +67,46 @@ const App = () => {
     }
   }, []);
 
-const handleSave = () => {
-  try {
-    const filename = prompt("Name this scenario:", "my_encounter");
+  useEffect(() => {
+    setShowRoundBanner(true);
+    const timer = setTimeout(() => setShowRoundBanner(false), 2000);
+    return () => clearTimeout(timer);
+  }, [round]);
 
-    if (!filename) {
-      console.log("Save cancelled by user.");
-      return;
+  const handleSave = () => {
+    try {
+      const filename = prompt("Name this scenario:", "my_encounter");
+      if (!filename) {
+        console.log("Save cancelled by user.");
+        return;
+      }
+      const data = {
+        characters,
+        round,
+        currentTurn: characters.findIndex(c => !c.defeated),
+        gridConfig,
+        spellMarkers,
+      };
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${filename}.json`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+      }, 100);
+    } catch (error) {
+      console.error("Error during save:", error);
+      alert("Failed to save scenario. Check the console for details.");
     }
-
-    const data = {
-      characters,
-      round,
-      currentTurn: characters.findIndex(c => !c.defeated),
-      gridConfig,
-      spellMarkers,
-    };
-
-    const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], { type: "application/json" });
-
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `${filename}.json`;
-    document.body.appendChild(a);
-
-    console.log("Triggering download...");
-    a.click();
-
-    // Give browser time to process click
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(a.href);
-      console.log("Download completed and cleaned up.");
-    }, 100);
-  } catch (error) {
-    console.error("Error during save:", error);
-    alert("Failed to save scenario. Check the console for details.");
-  }
-};
-
-
+  };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -133,12 +123,17 @@ const handleSave = () => {
         alert("Failed to load scenario.");
       }
     };
-
     reader.readAsText(file);
   };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white px-4 py-6">
+      {showRoundBanner && (
+        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-yellow-600 text-black px-6 py-2 rounded-lg shadow-lg z-50 text-lg font-bold">
+          ⚔️ Round {round} Begins!
+        </div>
+      )}
+
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div className="flex items-center gap-2 mb-2 sm:mb-0 relative">
           <button

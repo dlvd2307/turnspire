@@ -9,11 +9,12 @@ export const CombatProvider = ({ children }) => {
   const [round, setRound] = useState(0);
   const [selectedCharacterId, setSelectedCharacterId] = useState(null);
   const [gridConfig, setGridConfig] = useState({
-  rows: 20,
-  cols: 20,
-  squareSize: 40,
-  backgroundType: "grass.png"
-});
+    rows: 20,
+    cols: 20,
+    squareSize: 40,
+    backgroundType: "none",
+    customBackground: null, // Added for user-uploaded image support
+  });
   const [spellMarkers, setSpellMarkers] = useState([]);
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
   const [history, setHistory] = useState([]);
@@ -89,14 +90,14 @@ export const CombatProvider = ({ children }) => {
     );
   };
 
-const updateCharacterAC = (id, newAC) => {
-  saveHistory();
-  setCharacters((prev) =>
-    prev.map((char) =>
-      char.id === id ? { ...char, ac: Math.max(0, parseInt(newAC) || 0) } : char
-    )
-  );
-};
+  const updateCharacterAC = (id, newAC) => {
+    saveHistory();
+    setCharacters((prev) =>
+      prev.map((char) =>
+        char.id === id ? { ...char, ac: Math.max(0, parseInt(newAC) || 0) } : char
+      )
+    );
+  };
 
   const selectCharacter = (id) => {
     setSelectedCharacterId(id);
@@ -166,6 +167,7 @@ const updateCharacterAC = (id, newAC) => {
     const nextIndex = (currentIndex + 1) % sorted.length;
     const nextChar = sorted[nextIndex];
     setCurrentTurnId(nextChar.id);
+    setSelectedCharacterId(nextChar.id); // Auto-select the character whose turn it is
 
     const isNewRound = nextIndex === 0;
     if (isNewRound) {
@@ -203,6 +205,7 @@ const updateCharacterAC = (id, newAC) => {
         addCharacter,
         updateCharacterPosition,
         updateCharacterHP,
+        updateCharacterAC,
         selectCharacter,
         selectedCharacterId,
         applyCondition,
@@ -221,8 +224,6 @@ const updateCharacterAC = (id, newAC) => {
         selectedMarkerId,
         setSelectedMarkerId,
         undo,
-        updateCharacterAC,
-
       }}
     >
       {children}

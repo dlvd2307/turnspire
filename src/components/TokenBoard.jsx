@@ -25,11 +25,14 @@ const TokenBoard = () => {
     markDefeated,
   } = useCombat();
 
-  const { rows, cols, squareSize, backgroundType } = gridConfig;
+  const { rows, cols, squareSize, backgroundType, customBackground } = gridConfig;
   const width = cols * squareSize;
   const height = rows * squareSize;
 
-  const [bgImage] = useImage(backgroundType && backgroundType !== "none" ? terrainMap[backgroundType] : null);
+  const [defaultBgImage] = useImage(backgroundType !== "custom" && backgroundType !== "none" ? terrainMap[backgroundType] : null);
+  const [customBgImage] = useImage(backgroundType === "custom" ? customBackground : null);
+  const bgImage = backgroundType === "custom" ? customBgImage : defaultBgImage;
+
   const transformerRef = useRef();
   const shapeRefs = useRef({});
 
@@ -42,9 +45,7 @@ const TokenBoard = () => {
   const handleMarkerDrag = (e, id) => {
     const x = Math.round(e.target.x() / squareSize) * squareSize;
     const y = Math.round(e.target.y() / squareSize) * squareSize;
-    setSpellMarkers((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, x, y } : m))
-    );
+    setSpellMarkers((prev) => prev.map((m) => (m.id === id ? { ...m, x, y } : m)));
   };
 
   const getHPColor = (percent) => {
@@ -66,6 +67,7 @@ const TokenBoard = () => {
   return (
     <div className="mx-auto mb-6 border border-gray-700 rounded overflow-hidden">
       <Stage width={width} height={height} draggable style={{ backgroundColor: "#1F2937" }}>
+        {/* Background */}
         <Layer>
           {bgImage && (
             <KonvaImage
@@ -79,6 +81,7 @@ const TokenBoard = () => {
           )}
         </Layer>
 
+        {/* Grid */}
         <Layer>
           {Array.from({ length: rows }).map((_, row) =>
             Array.from({ length: cols }).map((_, col) => (
@@ -94,10 +97,10 @@ const TokenBoard = () => {
           )}
         </Layer>
 
+        {/* Spell Markers */}
         <Layer>
           {spellMarkers.map((m) => {
             const sizePx = m.squares * squareSize;
-
             const markerProps = {
               x: m.x,
               y: m.y,
@@ -189,6 +192,7 @@ const TokenBoard = () => {
           <Transformer ref={transformerRef} rotateEnabled={true} enabledAnchors={[]} />
         </Layer>
 
+        {/* Character Tokens */}
         <Layer>
           {characters.map((char) => {
             const { hp = 100, maxHp = 100 } = char;
@@ -216,21 +220,17 @@ const TokenBoard = () => {
                   setSelectedMarkerId(null);
                 }}
               >
-                {/* Highlight if it's this character's turn */}
-               {isCurrentTurn && (
-  <Circle
-    x={squareSize / 2}
-    y={squareSize / 2}
-    radius={squareSize / 2 + 12}
-    stroke="#22C55E" // Bright green highlight
-    strokeWidth={3}
-    dash={[3, 3]}
-    listening={false}
-  />
-)}
-
-
-                {/* Highlight if selected */}
+                {isCurrentTurn && (
+                  <Circle
+                    x={squareSize / 2}
+                    y={squareSize / 2}
+                    radius={squareSize / 2 + 12}
+                    stroke="#22C55E"
+                    strokeWidth={3}
+                    dash={[3, 3]}
+                    listening={false}
+                  />
+                )}
                 {isSelected && (
                   <Circle
                     x={squareSize / 2}
@@ -242,7 +242,6 @@ const TokenBoard = () => {
                     listening={false}
                   />
                 )}
-
                 <Rect x={0} y={-10} width={squareSize} height={6} fill="#374151" cornerRadius={2} />
                 <Rect
                   x={0}
@@ -252,7 +251,6 @@ const TokenBoard = () => {
                   fill={getHPColor(percent)}
                   cornerRadius={2}
                 />
-
                 {hasCondition && (
                   <Circle
                     x={squareSize / 2}
@@ -262,7 +260,6 @@ const TokenBoard = () => {
                     strokeWidth={2}
                   />
                 )}
-
                 {hasConcentration && (
                   <Circle
                     x={squareSize / 2}
@@ -273,7 +270,6 @@ const TokenBoard = () => {
                     dash={[4, 2]}
                   />
                 )}
-
                 <Rect
                   width={squareSize}
                   height={squareSize}
@@ -282,7 +278,6 @@ const TokenBoard = () => {
                   stroke="#E5E7EB"
                   strokeWidth={2}
                 />
-
                 <Text
                   text={char.name[0]}
                   fontSize={20}
@@ -294,7 +289,6 @@ const TokenBoard = () => {
                   width={squareSize}
                   height={squareSize}
                 />
-
                 <Text
                   text={char.name.length > 18 ? char.name.slice(0, 17) + "…" : char.name}
                   fontSize={12}
@@ -306,7 +300,6 @@ const TokenBoard = () => {
                   width={squareSize * 2}
                   height={14}
                 />
-
                 <Text
                   text={`${char.hp} / ${char.maxHp}`}
                   fontSize={10}
@@ -317,7 +310,6 @@ const TokenBoard = () => {
                   width={squareSize}
                   height={14}
                 />
-
                 {char.ac !== undefined && (
                   <Text
                     text={`AC: ${char.ac}`}

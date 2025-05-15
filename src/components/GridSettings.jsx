@@ -11,6 +11,21 @@ const GridSettings = () => {
     setGridConfig({ ...gridConfig, [field]: parsed });
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setGridConfig({
+        ...gridConfig,
+        backgroundType: "custom",
+        customBackground: reader.result,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="mb-4 max-w-xl mx-auto">
       <button
@@ -63,7 +78,17 @@ const GridSettings = () => {
                 <option value="desert">Desert</option>
                 <option value="dungeon">Dungeon</option>
                 <option value="snow">Snow</option>
+                <option value="custom">Custom (uploaded)</option>
               </select>
+            </label>
+            <label className="flex items-center gap-2">
+              <span>Upload Image:</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="text-white"
+              />
             </label>
           </div>
         </div>

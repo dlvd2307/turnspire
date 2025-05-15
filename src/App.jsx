@@ -150,7 +150,16 @@ const App = () => {
             className="hidden"
           />
         </div>
-        <h1 className="text-3xl font-bold text-center sm:flex-grow sm:-ml-20">Turnspire</h1>
+
+<img
+  src="/assets/turnspirelogo.png"
+  alt="Turnspire Logo"
+  className="h-28 sm:h-32 w-auto drop-shadow-lg"
+/>
+
+
+
+
         <div className="text-sm text-gray-400 mt-2 sm:mt-0 sm:text-right sm:w-40">
           {lastAutosave && `Last autosave: ${lastAutosave}`}
         </div>

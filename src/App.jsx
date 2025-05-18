@@ -33,12 +33,44 @@ const App = () => {
   const [lastAutosave, setLastAutosave] = useState(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [showRoundBanner, setShowRoundBanner] = useState(false);
+  const [loadedFromStorage, setLoadedFromStorage] = useState(false);
 
+  // Load autosave on first mount BEFORE render
+  useEffect(() => {
+    const saved = localStorage.getItem("turnspire-autosave");
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        setCharacters(data.characters || []);
+        setGridConfig(data.gridConfig || { rows: 20, cols: 20, squareSize: 40 });
+        setSpellMarkers(data.spellMarkers || []);
+        setSelectedCharacterId(null);
+      } catch {
+        console.warn("Failed to parse autosave.");
+      }
+    }
+    setLoadedFromStorage(true);
+  }, []);
+
+  // Set autosave label
   useEffect(() => {
     const now = new Date();
     const formatted = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     setLastAutosave(formatted);
   }, [characters, spellMarkers, round]);
+
+  // Perform autosave to localStorage
+  useEffect(() => {
+    if (!loadedFromStorage) return;
+    const data = {
+      characters,
+      round,
+      currentTurn: characters.findIndex(c => !c.defeated),
+      gridConfig,
+      spellMarkers,
+    };
+    localStorage.setItem("turnspire-autosave", JSON.stringify(data));
+  }, [characters, spellMarkers, round, gridConfig, loadedFromStorage]);
 
   useEffect(() => {
     if (document.getElementById("kofi-script")) return;
@@ -76,10 +108,8 @@ const App = () => {
   const handleSave = () => {
     try {
       const filename = prompt("Name this scenario:", "my_encounter");
-      if (!filename) {
-        console.log("Save cancelled by user.");
-        return;
-      }
+      if (!filename) return;
+
       const data = {
         characters,
         round,
@@ -126,6 +156,10 @@ const App = () => {
     reader.readAsText(file);
   };
 
+  if (!loadedFromStorage) {
+    return <div className="text-center mt-20 text-gray-400">Loading Turnspire…</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gray-900 text-white px-4 py-6">
       {showRoundBanner && (
@@ -150,16 +184,11 @@ const App = () => {
             className="hidden"
           />
         </div>
-
-<img
-  src="/assets/turnspirelogo.png"
-  alt="Turnspire Logo"
-  className="h-28 sm:h-32 w-auto drop-shadow-lg"
-/>
-
-
-
-
+        <img
+          src="/assets/turnspirelogo.png"
+          alt="Turnspire Logo"
+          className="h-28 sm:h-32 w-auto drop-shadow-lg"
+        />
         <div className="text-sm text-gray-400 mt-2 sm:mt-0 sm:text-right sm:w-40">
           {lastAutosave && `Last autosave: ${lastAutosave}`}
         </div>

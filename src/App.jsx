@@ -28,6 +28,7 @@ const App = () => {
   spellMarkers,
   setSpellMarkers,
   gridConfig,
+  resetCombat,
 } = useCombat();
 
 
@@ -182,21 +183,34 @@ useEffect(() => {
       )}
 
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <div className="flex items-center gap-2 mb-2 sm:mb-0 relative">
-          <button
-            onClick={handleSave}
-            className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-2 rounded text-sm z-10"
-          >
-            Save
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            onChange={(e) => handleFileChange(e)}
-            className="hidden"
-          />
-        </div>
+       <div className="flex items-center gap-2 mb-2 sm:mb-0 relative">
+  <button
+    onClick={handleSave}
+    className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-2 rounded text-sm z-10"
+  >
+    Save
+  </button>
+  <input
+    ref={fileInputRef}
+    type="file"
+    accept=".json"
+    onChange={(e) => handleFileChange(e)}
+    className="hidden"
+  />
+</div>
+
+<div className="flex items-center gap-2 mb-2 sm:mb-0 relative">
+  <button
+    onClick={() => {
+      const confirmed = confirm("This will clear the entire board. Are you sure?");
+      if (confirmed) resetCombat();
+    }}
+    className="bg-red-700 hover:bg-red-800 text-white px-3 py-2 rounded text-sm z-10"
+  >
+    Reset
+  </button>
+</div>
+
         <img
           src="/assets/turnspirelogo.png"
           alt="Turnspire Logo"

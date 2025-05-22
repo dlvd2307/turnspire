@@ -221,6 +221,22 @@ export const CombatProvider = ({ children }) => {
     }
   };
 
+const resetCombat = () => {
+  setCharacters([]);
+  setSpellMarkers([]);
+  setRound(0);
+  setCurrentTurnId(null);
+  setSelectedCharacterId(null);
+  setGridConfig((prev) => ({
+    ...prev,
+    rows: 20,
+    cols: 20,
+    squareSize: 40,
+    backgroundType: "none",
+    customBackground: null,
+  }));
+};
+
   const nextTurn = () => {
     const active = characters.filter((c) => !c.defeated);
     const sorted = [...active].sort((a, b) => b.initiative - a.initiative);
@@ -289,6 +305,7 @@ export const CombatProvider = ({ children }) => {
         setSelectedMarkerId,
         undo,
         loadedFromStorage,
+        resetCombat,
       }}
     >
       {children}

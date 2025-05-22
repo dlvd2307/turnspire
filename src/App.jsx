@@ -243,15 +243,19 @@ useEffect(() => {
         </div>
       </div>
 
-      <footer className="mt-10 text-center text-sm text-gray-400">
-        <p>Thank you for using Turnspire.</p>
-        <p>
-          If you have questions, ideas, or need help, email me at{" "}
-          <a href="mailto:turnspire@gmail.com" className="text-blue-400 underline">
-            turnspire@gmail.com
-          </a>.
-        </p>
-      </footer>
+      <footer className="mt-10 text-center text-sm text-gray-400 space-y-1">
+  <p>Thank you for using Turnspire.</p>
+  <p>
+    If you have questions, ideas, or need help, email me at{" "}
+    <a href="mailto:turnspire@gmail.com" className="text-blue-400 underline">
+      turnspire@gmail.com
+    </a>.
+  </p>
+  <p className="pt-2 text-xs text-gray-500">
+    © {new Date().getFullYear()} Dylan van Dijk. All rights reserved.
+  </p>
+</footer>
+
 
       <button
         onClick={() => setIsHelpOpen(true)}

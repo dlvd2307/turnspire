@@ -55,12 +55,12 @@ const TokenBoard = () => {
   };
 
   useEffect(() => {
-    if (transformerRef.current && selectedMarkerId) {
-      const node = shapeRefs.current[selectedMarkerId];
-      if (node) {
-        transformerRef.current.nodes([node]);
-        transformerRef.current.getLayer().batchDraw();
-      }
+    const node = shapeRefs.current[selectedMarkerId];
+    if (transformerRef.current && node) {
+      transformerRef.current.nodes([node]);
+      transformerRef.current.getLayer().batchDraw();
+    } else if (transformerRef.current) {
+      transformerRef.current.nodes([]);
     }
   }, [selectedMarkerId, spellMarkers]);
 
@@ -182,6 +182,7 @@ const TokenBoard = () => {
                     if (confirmed) {
                       setSpellMarkers((prev) => prev.filter((marker) => marker.id !== m.id));
                       setSelectedMarkerId(null);
+                      delete shapeRefs.current[m.id];
                     }
                   }}
                   style={{ cursor: "pointer" }}
@@ -189,7 +190,9 @@ const TokenBoard = () => {
               </Group>
             );
           })}
-          <Transformer ref={transformerRef} rotateEnabled={true} enabledAnchors={[]} />
+          {selectedMarkerId && spellMarkers.some(m => m.id === selectedMarkerId) && (
+            <Transformer ref={transformerRef} rotateEnabled={true} enabledAnchors={[]} />
+          )}
         </Layer>
 
         {/* Character Tokens */}

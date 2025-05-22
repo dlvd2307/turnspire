@@ -13,11 +13,12 @@ export const CombatProvider = ({ children }) => {
     cols: 20,
     squareSize: 40,
     backgroundType: "none",
-    customBackground: null, // Added for user-uploaded image support
+    customBackground: null,
   });
   const [spellMarkers, setSpellMarkers] = useState([]);
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
   const [history, setHistory] = useState([]);
+  const [loadedFromStorage, setLoadedFromStorage] = useState(false);
 
   const saveHistory = () => {
     setHistory((prev) => [
@@ -57,6 +58,71 @@ export const CombatProvider = ({ children }) => {
       window.removeEventListener("keydown", handleUndo);
     };
   }, [history]);
+
+  useEffect(() => {
+    const handleSetRound = (e) => setRound(e.detail);
+    const handleSetCurrentTurn = (e) => setCurrentTurnId(e.detail);
+    window.addEventListener("set-round", handleSetRound);
+    window.addEventListener("set-current-turn", handleSetCurrentTurn);
+    return () => {
+      window.removeEventListener("set-round", handleSetRound);
+      window.removeEventListener("set-current-turn", handleSetCurrentTurn);
+    };
+  }, []);
+
+  const initializeBlankState = () => {
+    setCharacters([]);
+    setRound(0);
+    setCurrentTurnId(null);
+    setSpellMarkers([]);
+    setGridConfig({
+      rows: 20,
+      cols: 20,
+      squareSize: 40,
+      backgroundType: "none",
+      customBackground: null,
+    });
+  };
+
+  useEffect(() => {
+    const saved = localStorage.getItem("turnspire-autosave");
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        setCharacters(data.characters || []);
+        setGridConfig(data.gridConfig || { rows: 20, cols: 20, squareSize: 40 });
+        setSpellMarkers(data.spellMarkers || []);
+        setSelectedCharacterId(null);
+
+        if (typeof data.round === "number") {
+          setTimeout(() => window.dispatchEvent(new CustomEvent("set-round", { detail: data.round })), 0);
+        }
+
+        if (data.currentTurnId) {
+          setTimeout(() => window.dispatchEvent(new CustomEvent("set-current-turn", { detail: data.currentTurnId })), 0);
+        }
+      } catch {
+        console.warn("Failed to load autosave.");
+        initializeBlankState();
+      }
+    } else {
+      initializeBlankState();
+    }
+
+    setLoadedFromStorage(true);
+  }, []);
+
+  useEffect(() => {
+    if (!loadedFromStorage) return;
+    const data = {
+      characters,
+      round,
+      currentTurnId,
+      gridConfig,
+      spellMarkers,
+    };
+    localStorage.setItem("turnspire-autosave", JSON.stringify(data));
+  }, [characters, round, currentTurnId, gridConfig, spellMarkers, loadedFromStorage]);
 
   const addCharacter = (char) => {
     const newChar = {
@@ -107,9 +173,7 @@ export const CombatProvider = ({ children }) => {
     saveHistory();
     setCharacters((prev) =>
       prev.map((char) =>
-        char.id === id
-          ? { ...char, conditions: [...char.conditions, condition] }
-          : char
+        char.id === id ? { ...char, conditions: [...char.conditions, condition] } : char
       )
     );
   };
@@ -167,7 +231,7 @@ export const CombatProvider = ({ children }) => {
     const nextIndex = (currentIndex + 1) % sorted.length;
     const nextChar = sorted[nextIndex];
     setCurrentTurnId(nextChar.id);
-    setSelectedCharacterId(nextChar.id); // Auto-select the character whose turn it is
+    setSelectedCharacterId(nextChar.id);
 
     const isNewRound = nextIndex === 0;
     if (isNewRound) {
@@ -224,6 +288,7 @@ export const CombatProvider = ({ children }) => {
         selectedMarkerId,
         setSelectedMarkerId,
         undo,
+        loadedFromStorage,
       }}
     >
       {children}

@@ -18,16 +18,18 @@ import "./index.css";
 
 const App = () => {
   const {
-    nextTurn,
-    round,
-    characters,
-    setCharacters,
-    setGridConfig,
-    setSelectedCharacterId,
-    spellMarkers,
-    setSpellMarkers,
-    gridConfig,
-  } = useCombat();
+  nextTurn,
+  round,
+  characters,
+  currentTurnId, // ← This is fine
+  setCharacters,
+  setGridConfig,
+  setSelectedCharacterId,
+  spellMarkers,
+  setSpellMarkers,
+  gridConfig,
+} = useCombat();
+
 
   const fileInputRef = useRef();
   const [lastAutosave, setLastAutosave] = useState(null);
@@ -36,21 +38,32 @@ const App = () => {
   const [loadedFromStorage, setLoadedFromStorage] = useState(false);
 
   // Load autosave on first mount BEFORE render
-  useEffect(() => {
-    const saved = localStorage.getItem("turnspire-autosave");
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        setCharacters(data.characters || []);
-        setGridConfig(data.gridConfig || { rows: 20, cols: 20, squareSize: 40 });
-        setSpellMarkers(data.spellMarkers || []);
-        setSelectedCharacterId(null);
-      } catch {
-        console.warn("Failed to parse autosave.");
+useEffect(() => {
+  const saved = localStorage.getItem("turnspire-autosave");
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      setCharacters(data.characters || []);
+      setGridConfig(data.gridConfig || { rows: 20, cols: 20, squareSize: 40 });
+      setSpellMarkers(data.spellMarkers || []);
+      setSelectedCharacterId(null);
+
+      if (typeof data.round === "number") {
+        setTimeout(() => window.dispatchEvent(new CustomEvent("set-round", { detail: data.round })), 0);
       }
+
+      if (data.currentTurnId) {
+        setTimeout(() => window.dispatchEvent(new CustomEvent("set-current-turn", { detail: data.currentTurnId })), 0);
+      }
+    } catch {
+      console.warn("Failed to load autosave.");
     }
-    setLoadedFromStorage(true);
-  }, []);
+  }
+
+  // ✅ This line is missing
+  setLoadedFromStorage(true);
+}, []);
+
 
   // Set autosave label
   useEffect(() => {
@@ -59,18 +72,18 @@ const App = () => {
     setLastAutosave(formatted);
   }, [characters, spellMarkers, round]);
 
-  // Perform autosave to localStorage
-  useEffect(() => {
-    if (!loadedFromStorage) return;
-    const data = {
-      characters,
-      round,
-      currentTurn: characters.findIndex(c => !c.defeated),
-      gridConfig,
-      spellMarkers,
-    };
-    localStorage.setItem("turnspire-autosave", JSON.stringify(data));
-  }, [characters, spellMarkers, round, gridConfig, loadedFromStorage]);
+useEffect(() => {
+  if (!loadedFromStorage) return;
+  const data = {
+    characters,
+    round,
+    currentTurnId, // ✅ Correct
+    gridConfig,
+    spellMarkers,
+  };
+  localStorage.setItem("turnspire-autosave", JSON.stringify(data));
+}, [characters, spellMarkers, round, currentTurnId, gridConfig, loadedFromStorage]);
+
 
   useEffect(() => {
     if (document.getElementById("kofi-script")) return;

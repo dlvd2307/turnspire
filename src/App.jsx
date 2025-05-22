@@ -183,43 +183,45 @@ useEffect(() => {
       )}
 
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-       <div className="flex items-center gap-2 mb-2 sm:mb-0 relative">
-  <button
-    onClick={handleSave}
-    className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-2 rounded text-sm z-10"
-  >
-    Save
-  </button>
-  <input
-    ref={fileInputRef}
-    type="file"
-    accept=".json"
-    onChange={(e) => handleFileChange(e)}
-    className="hidden"
+  {/* Left: Save Button */}
+  <div className="flex items-center gap-2 mb-2 sm:mb-0">
+    <button
+      onClick={handleSave}
+      className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-2 rounded text-sm"
+    >
+      Save
+    </button>
+    <input
+      ref={fileInputRef}
+      type="file"
+      accept=".json"
+      onChange={(e) => handleFileChange(e)}
+      className="hidden"
+    />
+  </div>
+
+  {/* Center: Logo */}
+  <img
+    src="/assets/turnspirelogo.png"
+    alt="Turnspire Logo"
+    className="h-28 sm:h-32 w-auto drop-shadow-lg"
   />
-</div>
 
-<div className="flex items-center gap-2 mb-2 sm:mb-0 relative">
-  <button
-    onClick={() => {
-      const confirmed = confirm("This will clear the entire board. Are you sure?");
-      if (confirmed) resetCombat();
-    }}
-    className="bg-red-700 hover:bg-red-800 text-white px-3 py-2 rounded text-sm z-10"
-  >
-    Reset
-  </button>
-</div>
+  {/* Right: Reset + Timestamp */}
+  <div className="flex items-center gap-3 mt-2 sm:mt-0 sm:text-right text-sm text-gray-400">
+    <button
+      onClick={() => {
+        const confirmed = confirm("This will clear the entire board. Are you sure?");
+        if (confirmed) resetCombat();
+      }}
+      className="bg-red-700 hover:bg-red-800 text-white px-3 py-2 rounded text-sm"
+    >
+      Reset
+    </button>
+    {lastAutosave && <div>Last autosave: {lastAutosave}</div>}
+  </div>
+</header>
 
-        <img
-          src="/assets/turnspirelogo.png"
-          alt="Turnspire Logo"
-          className="h-28 sm:h-32 w-auto drop-shadow-lg"
-        />
-        <div className="text-sm text-gray-400 mt-2 sm:mt-0 sm:text-right sm:w-40">
-          {lastAutosave && `Last autosave: ${lastAutosave}`}
-        </div>
-      </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3">

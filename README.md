@@ -19,31 +19,6 @@
 
 ---
 
-## 🚀 Getting Started
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/your-username/turnspire.git
-cd turnspire
-```
-
-### 2. Install dependencies
-
-```bash
-npm install
-```
-
-### 3. Start the development server
-
-```bash
-npm run dev
-```
-
-Then open [http://localhost:5173](http://localhost:5173) in your browser.
-
----
-
 ## 🛠 Tech Stack
 
 - React  
@@ -59,23 +34,20 @@ Then open [http://localhost:5173](http://localhost:5173) in your browser.
 - ✅ Box-select tokens  
 - ✅ Collapsible initiative group views  
 - ✅ Group-wide effect application  
-- ⏳ Export/Import saves  
+- ✅Export/Import saves  
 - ⏳ Token icons & map overlays  
 - ⏳ Responsive mobile optimization  
 - ⏳ Theme customization (light/dark)
 
 ---
 
-## ✨ Live Demo
-
-> Coming soon at [yourdeployment.com](https://yourdeployment.com)
-
+Live app at Turnspire.app
 ---
 
 ## 🧑‍💻 Author
 
 **Created by Dylan Van Dijk**  
-DMs, hackers, and makers welcome.
+
 
 ---
 

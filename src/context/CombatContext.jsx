@@ -165,6 +165,14 @@ export const CombatProvider = ({ children }) => {
     );
   };
 
+  const updateCharacterInitiative = (id, newValue) => {
+    setCharacters((prev) =>
+      prev.map((char) =>
+        char.id === id ? { ...char, initiative: parseInt(newValue) || 0 } : char
+      )
+    );
+  };
+
   const selectCharacter = (id) => {
     setSelectedCharacterId(id);
   };
@@ -190,10 +198,7 @@ export const CombatProvider = ({ children }) => {
     setCharacters((prev) =>
       prev.map((char) =>
         char.id === id
-          ? {
-              ...char,
-              conditions: char.conditions.filter((c) => c.name !== conditionName),
-            }
+          ? { ...char, conditions: char.conditions.filter((c) => c.name !== conditionName) }
           : char
       )
     );
@@ -221,24 +226,49 @@ export const CombatProvider = ({ children }) => {
     }
   };
 
-const resetCombat = () => {
-  setCharacters([]);
-  setSpellMarkers([]);
-  setRound(0);
-  setCurrentTurnId(null);
-  setSelectedCharacterId(null);
-  setGridConfig((prev) => ({
-    ...prev,
-    rows: 20,
-    cols: 20,
-    squareSize: 40,
-    backgroundType: "none",
-    customBackground: null,
-  }));
-};
+  const resetCombat = () => {
+    setCharacters([]);
+    setSpellMarkers([]);
+    setRound(0);
+    setCurrentTurnId(null);
+    setSelectedCharacterId(null);
+    setGridConfig((prev) => ({
+      ...prev,
+      rows: 20,
+      cols: 20,
+      squareSize: 40,
+      backgroundType: "none",
+      customBackground: null,
+    }));
+  };
+
+  const softResetCombat = () => {
+    setCharacters((prev) =>
+      prev.map((char) => ({
+        ...char,
+        conditions: [],
+        concentration: null,
+        defeated: false,
+        initiative: null,
+        position: { x: 0, y: 0 },
+      }))
+    );
+    setSpellMarkers([]);
+    setRound(0);
+    setCurrentTurnId(null);
+    setSelectedCharacterId(null);
+    setGridConfig((prev) => ({
+      ...prev,
+      rows: 20,
+      cols: 20,
+      squareSize: 40,
+      backgroundType: "none",
+      customBackground: null,
+    }));
+  };
 
   const nextTurn = () => {
-    const active = characters.filter((c) => !c.defeated);
+    const active = characters.filter((c) => !c.defeated && c.initiative != null);
     const sorted = [...active].sort((a, b) => b.initiative - a.initiative);
 
     if (!sorted.length) return;
@@ -286,6 +316,7 @@ const resetCombat = () => {
         updateCharacterPosition,
         updateCharacterHP,
         updateCharacterAC,
+        updateCharacterInitiative,
         selectCharacter,
         selectedCharacterId,
         applyCondition,
@@ -306,6 +337,7 @@ const resetCombat = () => {
         undo,
         loadedFromStorage,
         resetCombat,
+        softResetCombat,
       }}
     >
       {children}

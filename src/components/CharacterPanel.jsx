@@ -11,12 +11,14 @@ const CharacterPanel = () => {
     removeCharacter,
     updateCharacterHP,
     updateCharacterAC,
+    updateCharacterInitiative,
   } = useCombat();
 
   const selectedCharacter = characters.find((char) => char.id === selectedCharacterId);
   if (!selectedCharacter) return null;
 
-  const { id, name, hp, maxHp, ac, type, conditions, concentration, defeated } = selectedCharacter;
+  const { id, name, hp, maxHp, ac, initiative, type, conditions, concentration, defeated } =
+    selectedCharacter;
 
   const handleRemove = () => {
     const confirmed = confirm(`Remove ${name} from the board?`);
@@ -58,8 +60,8 @@ const CharacterPanel = () => {
           value={hp}
           onChange={(e) => updateCharacterHP(id, parseInt(e.target.value) || 0)}
           className="ml-2 w-16 text-black px-1 rounded"
-        />
-        {" "} / {maxHp}
+        />{" "}
+        / {maxHp}
       </p>
 
       <p>
@@ -80,6 +82,16 @@ const CharacterPanel = () => {
         />
       </p>
 
+      <p>
+        Initiative:{" "}
+        <input
+          type="number"
+          value={initiative ?? ""}
+          onChange={(e) => updateCharacterInitiative(id, e.target.value)}
+          className="ml-2 w-16 text-black px-1 rounded"
+        />
+      </p>
+
       <p>Type: {type === "enemy" ? "Enemy" : "Character"}</p>
 
       {conditions.length > 0 && (
@@ -91,7 +103,10 @@ const CharacterPanel = () => {
                 key={index}
                 className="flex items-center justify-between bg-gray-700 px-2 py-1 rounded"
               >
-                <span>{cond.name} ({cond.remainingRounds} round{cond.remainingRounds > 1 ? "s" : ""})</span>
+                <span>
+                  {cond.name} ({cond.remainingRounds} round
+                  {cond.remainingRounds > 1 ? "s" : ""})
+                </span>
                 <button
                   className="text-red-400 hover:text-red-600 ml-2"
                   onClick={() => removeCondition(id, cond.name)}
@@ -108,7 +123,10 @@ const CharacterPanel = () => {
         <div>
           <h3 className="font-semibold mb-1">Concentration:</h3>
           <div className="flex items-center justify-between bg-gray-700 px-2 py-1 rounded">
-            <span>{concentration.spell} ({concentration.remainingRounds} round{concentration.remainingRounds > 1 ? "s" : ""})</span>
+            <span>
+              {concentration.spell} ({concentration.remainingRounds} round
+              {concentration.remainingRounds > 1 ? "s" : ""})
+            </span>
             <button
               className="text-red-400 hover:text-red-600 ml-2"
               onClick={() => clearConcentration(id)}

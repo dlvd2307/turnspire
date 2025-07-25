@@ -244,14 +244,16 @@ export const CombatProvider = ({ children }) => {
 
   const softResetCombat = () => {
     setCharacters((prev) =>
-      prev.map((char) => ({
-        ...char,
-        conditions: [],
-        concentration: null,
-        defeated: false,
-        initiative: null,
-        position: { x: 0, y: 0 },
-      }))
+      prev
+        .filter((char) => char.type !== "enemy") // 💥 Remove enemies
+        .map((char) => ({
+          ...char,
+          conditions: [],
+          concentration: null,
+          defeated: false,
+          initiative: null,
+          position: { x: 0, y: 0 },
+        }))
     );
     setSpellMarkers([]);
     setRound(0);

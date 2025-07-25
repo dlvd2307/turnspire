@@ -26,6 +26,8 @@ const HelpPopup = ({ isOpen, onClose }) => {
             </ul>
             <p><strong>✨ Spell Markers:</strong> Use the form to add labeled shapes (cube, sphere, cone). Drag, rotate, or delete using the ❌ button.</p>
             <p><strong>🧮 Grid Settings:</strong> Adjust rows, columns, square size, and select a terrain background (grass, desert, dungeon, snow, town, or none).</p>
+            <p><strong>🔃 Soft Reset:</strong> The Soft Reset button clears the board and combat state but keeps player characters and their current HP/AC. Use it to prep for a new encounter without re-adding your party.</p>
+            <p><strong>💀 Death Saves:</strong> When a character hits 0 HP, use the manual +Success and +Failure buttons to track their death saves. 3 failures = dead. 3 successes = stable.</p>
             <p><strong>💾 Save & Load:</strong> Save your scenario to a file and load it later. Autosave keeps track of changes.</p>
             <p><strong>↩️ Undo:</strong> Made a mistake? Use the <span className="bg-yellow-600 px-1 rounded">Undo</span> button or press Ctrl+Z to roll back your last action.</p>
             <p><strong>☕ Support the Project:</strong> Enjoying Turnspire? Click the Ko-fi button to buy me a potion.</p>

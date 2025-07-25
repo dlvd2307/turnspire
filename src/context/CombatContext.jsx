@@ -99,7 +99,10 @@ export const CombatProvider = ({ children }) => {
         }
 
         if (data.currentTurnId) {
-          setTimeout(() => window.dispatchEvent(new CustomEvent("set-current-turn", { detail: data.currentTurnId })), 0);
+          setTimeout(
+            () => window.dispatchEvent(new CustomEvent("set-current-turn", { detail: data.currentTurnId })),
+            0
+          );
         }
       } catch {
         console.warn("Failed to load autosave.");
@@ -132,6 +135,7 @@ export const CombatProvider = ({ children }) => {
       conditions: [],
       concentration: null,
       defeated: false,
+      deathSaves: { success: 0, fail: 0, stable: false },
     };
     setCharacters((prev) => {
       const updated = [...prev, newChar];
@@ -147,12 +151,33 @@ export const CombatProvider = ({ children }) => {
     );
   };
 
+  const resetDeathSaves = (char) => ({
+    ...char,
+    deathSaves: { success: 0, fail: 0, stable: false },
+  });
+
+  const ensureDeathSaves = (char) =>
+    char.deathSaves
+      ? char
+      : { ...char, deathSaves: { success: 0, fail: 0, stable: false } };
+
   const updateCharacterHP = (id, newHP) => {
     saveHistory();
     setCharacters((prev) =>
-      prev.map((char) =>
-        char.id === id ? { ...char, hp: Math.max(0, Math.min(newHP, char.maxHp)) } : char
-      )
+      prev.map((char) => {
+        if (char.id !== id) return char;
+        const clamped = Math.max(0, Math.min(newHP, char.maxHp));
+        // If they heal above 0 HP, clear death saves & stable status.
+        if (clamped > 0) {
+          return {
+            ...resetDeathSaves(char),
+            hp: clamped,
+            defeated: false,
+          };
+        }
+        // If they drop to 0, ensure death save state exists.
+        return ensureDeathSaves({ ...char, hp: clamped });
+      })
     );
   };
 
@@ -170,6 +195,45 @@ export const CombatProvider = ({ children }) => {
       prev.map((char) =>
         char.id === id ? { ...char, initiative: parseInt(newValue) || 0 } : char
       )
+    );
+  };
+
+  const recordDeathSaveSuccess = (id) => {
+    setCharacters((prev) =>
+      prev.map((char) => {
+        if (char.id !== id) return char;
+        const ds = ensureDeathSaves(char).deathSaves;
+        if (ds.stable || char.defeated) return char; // already done
+        const success = Math.min(3, ds.success + 1);
+        const stable = success >= 3;
+        return {
+          ...char,
+          deathSaves: { ...ds, success, stable },
+        };
+      })
+    );
+  };
+
+  const recordDeathSaveFailure = (id) => {
+    setCharacters((prev) =>
+      prev.map((char) => {
+        if (char.id !== id) return char;
+        const ds = ensureDeathSaves(char).deathSaves;
+        if (ds.stable || char.defeated) return char; // already done
+        const fail = Math.min(3, ds.fail + 1);
+        const defeated = fail >= 3 ? true : char.defeated;
+        return {
+          ...char,
+          deathSaves: { ...ds, fail },
+          defeated,
+        };
+      })
+    );
+  };
+
+  const clearDeathSaves = (id) => {
+    setCharacters((prev) =>
+      prev.map((char) => (char.id === id ? resetDeathSaves(char) : char))
     );
   };
 
@@ -245,9 +309,9 @@ export const CombatProvider = ({ children }) => {
   const softResetCombat = () => {
     setCharacters((prev) =>
       prev
-        .filter((char) => char.type !== "enemy") // 💥 Remove enemies
+        .filter((char) => char.type !== "enemy")
         .map((char) => ({
-          ...char,
+          ...resetDeathSaves(char),
           conditions: [],
           concentration: null,
           defeated: false,
@@ -319,6 +383,9 @@ export const CombatProvider = ({ children }) => {
         updateCharacterHP,
         updateCharacterAC,
         updateCharacterInitiative,
+        recordDeathSaveSuccess,
+        recordDeathSaveFailure,
+        clearDeathSaves,
         selectCharacter,
         selectedCharacterId,
         applyCondition,

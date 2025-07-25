@@ -12,13 +12,27 @@ const CharacterPanel = () => {
     updateCharacterHP,
     updateCharacterAC,
     updateCharacterInitiative,
+    recordDeathSaveSuccess,
+    recordDeathSaveFailure,
+    clearDeathSaves,
   } = useCombat();
 
   const selectedCharacter = characters.find((char) => char.id === selectedCharacterId);
   if (!selectedCharacter) return null;
 
-  const { id, name, hp, maxHp, ac, initiative, type, conditions, concentration, defeated } =
-    selectedCharacter;
+  const {
+    id,
+    name,
+    hp,
+    maxHp,
+    ac,
+    initiative,
+    type,
+    conditions,
+    concentration,
+    defeated,
+    deathSaves,
+  } = selectedCharacter;
 
   const handleRemove = () => {
     const confirmed = confirm(`Remove ${name} from the board?`);
@@ -28,6 +42,11 @@ const CharacterPanel = () => {
   const handleDefeat = () => {
     if (!defeated) markDefeated(id);
   };
+
+  const isDown = hp === 0 && !defeated;
+  const successes = deathSaves?.success ?? 0;
+  const fails = deathSaves?.fail ?? 0;
+  const stable = deathSaves?.stable ?? false;
 
   return (
     <div className="bg-gray-800 text-white p-4 rounded shadow max-w-md w-full mt-4 space-y-3">
@@ -70,14 +89,14 @@ const CharacterPanel = () => {
           type="number"
           value={ac ?? ""}
           onChange={(e) => {
-            const val = e.target.value;
-            const parsed = parseInt(val);
-            if (!isNaN(parsed)) {
-              updateCharacterAC(id, parsed);
-            } else if (val === "") {
-              updateCharacterAC(id, 0);
-            }
-          }}
+          const val = e.target.value;
+          const parsed = parseInt(val);
+          if (!isNaN(parsed)) {
+            updateCharacterAC(id, parsed);
+          } else if (val === "") {
+            updateCharacterAC(id, 0);
+          }
+        }}
           className="ml-2 w-16 text-black px-1 rounded"
         />
       </p>
@@ -93,6 +112,53 @@ const CharacterPanel = () => {
       </p>
 
       <p>Type: {type === "enemy" ? "Enemy" : "Character"}</p>
+
+      {/* Death Saves */}
+      {isDown && (
+        <div className="mt-2">
+          <h3 className="font-semibold mb-1">Death Saves</h3>
+
+          {stable ? (
+            <p className="text-green-400">Stabilized</p>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 mb-2">
+                <span>Successes: {"✅".repeat(successes)}{" "}
+                  {"⬜".repeat(3 - successes)}</span>
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <span>Failures: {"❌".repeat(fails)}{" "}
+                  {"⬜".repeat(3 - fails)}</span>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => recordDeathSaveSuccess(id)}
+                  className="bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded text-sm"
+                >
+                  + Success
+                </button>
+                <button
+                  onClick={() => recordDeathSaveFailure(id)}
+                  className="bg-red-700 hover:bg-red-800 text-white px-2 py-1 rounded text-sm"
+                >
+                  + Failure
+                </button>
+                <button
+                  onClick={() => clearDeathSaves(id)}
+                  className="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-sm"
+                >
+                  Reset
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {defeated && (
+        <p className="text-red-400 font-semibold">Dead</p>
+      )}
 
       {conditions.length > 0 && (
         <div>

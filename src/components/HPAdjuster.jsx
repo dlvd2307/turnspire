@@ -2,66 +2,139 @@
 import { useState } from "react";
 
 /**
- * Compact damage/heal control.
+ * Damage / healing / temporary HP controls for a single combatant.
  *
  * Props:
- *   hp      - current hit points (number)
- *   maxHp   - maximum hit points (number) - caps healing
- *   onApply - (newHp) => void
+ *   hp, maxHp, tempHp - current values
+ *   onDamage(amount)  - damage hits temp HP first
+ *   onHeal(amount)    - capped at maxHp, never restores temp HP
+ *   onSetTempHp(value)- replaces the current pool (5e: temp HP doesn't stack)
  */
-const HPAdjuster = ({ hp, maxHp, onApply }) => {
+const HPAdjuster = ({ hp, maxHp, tempHp = 0, onDamage, onHeal, onSetTempHp }) => {
   const [amount, setAmount] = useState("");
+  const [temp, setTemp] = useState("");
 
-  const apply = (sign) => {
+  const submit = (action) => {
     const value = parseInt(amount, 10);
     if (!Number.isFinite(value) || value <= 0) return;
-
-    const ceiling = Number.isFinite(maxHp) ? maxHp : Infinity;
-    const next =
-      sign < 0
-        ? Math.max(0, hp - value)
-        : Math.min(ceiling, hp + value);
-
-    onApply(next);
+    action(value);
     setAmount("");
   };
 
-  const handleKeyDown = (e) => {
+  const commitTemp = () => {
+    if (temp === "") return;
+    onSetTempHp(temp);
+    setTemp("");
+  };
+
+  const handleAmountKey = (e) => {
     if (e.key !== "Enter") return;
     e.preventDefault();
     // Enter damages, Shift+Enter heals - keeps hands off the mouse mid-combat.
-    apply(e.shiftKey ? 1 : -1);
+    submit(e.shiftKey ? onHeal : onDamage);
   };
 
+  const handleTempKey = (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    commitTemp();
+  };
+
+  const pool = tempHp > 0 ? hp + tempHp : hp;
+  const barPercent = maxHp > 0 ? Math.min(100, (hp / maxHp) * 100) : 0;
+
   return (
-    <span className="inline-flex items-center gap-1 ml-2">
-      <input
-        type="number"
-        min="1"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="0"
-        aria-label="Amount to apply"
-        className="w-14 px-1 rounded text-black text-center"
-      />
-      <button
-        type="button"
-        onClick={() => apply(-1)}
-        title="Apply damage (Enter)"
-        className="bg-red-700 hover:bg-red-800 text-white px-2 py-0.5 rounded text-sm"
-      >
-        Damage
-      </button>
-      <button
-        type="button"
-        onClick={() => apply(1)}
-        title="Heal (Shift+Enter)"
-        className="bg-green-700 hover:bg-green-800 text-white px-2 py-0.5 rounded text-sm"
-      >
-        Heal
-      </button>
-    </span>
+    <div className="space-y-3">
+      {/* Current totals */}
+      <div className="flex items-baseline gap-2">
+        <span className="text-2xl font-semibold tabular-nums">{hp}</span>
+        <span className="text-slate-400">/ {maxHp}</span>
+        {tempHp > 0 && (
+          <span className="text-sky-300 text-sm font-medium">
+            +{tempHp} temp
+          </span>
+        )}
+        {tempHp > 0 && (
+          <span className="text-slate-500 text-xs">({pool} effective)</span>
+        )}
+      </div>
+
+      {/* HP bar, with temp shown as a distinct segment */}
+      <div className="flex h-2 w-full gap-0.5 overflow-hidden rounded bg-slate-700">
+        <div
+          className="h-full rounded-l bg-emerald-500 transition-all"
+          style={{ width: `${barPercent}%` }}
+        />
+        {tempHp > 0 && (
+          <div
+            className="h-full bg-sky-400 transition-all"
+            style={{ width: `${Math.min(100, (tempHp / maxHp) * 100)}%` }}
+          />
+        )}
+      </div>
+
+      {/* Damage / heal */}
+      <div className="flex items-center gap-2">
+        <input
+          type="number"
+          min="1"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          onKeyDown={handleAmountKey}
+          placeholder="0"
+          aria-label="Damage or healing amount"
+          className="w-16 rounded border border-slate-600 bg-slate-900 px-2 py-1
+                     text-center tabular-nums text-white
+                     focus:border-slate-400 focus:outline-none"
+        />
+        <button
+          type="button"
+          onClick={() => submit(onDamage)}
+          title="Apply damage (Enter)"
+          className="rounded bg-red-700 px-3 py-1 text-sm text-white hover:bg-red-600"
+        >
+          Damage
+        </button>
+        <button
+          type="button"
+          onClick={() => submit(onHeal)}
+          title="Heal (Shift+Enter)"
+          className="rounded bg-emerald-700 px-3 py-1 text-sm text-white hover:bg-emerald-600"
+        >
+          Heal
+        </button>
+      </div>
+
+      {/* Temp HP */}
+      <div className="flex items-center gap-2">
+        <label className="text-sm text-slate-400" htmlFor="temp-hp-input">
+          Temp HP
+        </label>
+        <input
+          id="temp-hp-input"
+          type="number"
+          min="0"
+          value={temp}
+          onChange={(e) => setTemp(e.target.value)}
+          onKeyDown={handleTempKey}
+          onBlur={commitTemp}
+          placeholder={String(tempHp)}
+          className="w-16 rounded border border-slate-600 bg-slate-900 px-2 py-1
+                     text-center tabular-nums text-white
+                     focus:border-slate-400 focus:outline-none"
+        />
+        {tempHp > 0 && (
+          <button
+            type="button"
+            onClick={() => onSetTempHp(0)}
+            className="text-sm text-slate-400 underline hover:text-slate-200"
+          >
+            Clear
+          </button>
+        )}
+        <span className="text-xs text-slate-500">Replaces, doesn't stack</span>
+      </div>
+    </div>
   );
 };
 

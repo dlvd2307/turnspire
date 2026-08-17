@@ -9,22 +9,37 @@ const EnemyForm = () => {
   const [ac, setAc] = useState("");
   const [count, setCount] = useState("");
   const [initiative, setInitiative] = useState("");
+  const [asGroup, setAsGroup] = useState(true);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name || !hp || !ac || !count) return;
 
-    const newEnemies = Array.from({ length: parseInt(count) }).map((_, i) => ({
+    const total = parseInt(count);
+    const grouped = asGroup && total > 1;
+
+    // A group shares one initiative roll, so they act together in the order.
+    const sharedInitiative =
+      initiative !== "" ? parseInt(initiative) : Math.floor(Math.random() * 20) + 1;
+
+    const newEnemies = Array.from({ length: total }).map((_, i) => ({
       id: uuidv4(),
-      name: count > 1 ? `${name} ${i + 1}` : name,
+      name: total > 1 ? `${name} ${i + 1}` : name,
       hp: parseInt(hp),
       maxHp: parseInt(hp),
+      tempHp: 0,
       ac: parseInt(ac),
-      initiative: initiative !== "" ? parseInt(initiative) : Math.floor(Math.random() * 20) + 1,
+      initiative: grouped
+        ? sharedInitiative
+        : initiative !== ""
+        ? parseInt(initiative)
+        : Math.floor(Math.random() * 20) + 1,
       type: "enemy",
+      groupName: grouped ? name : undefined,
       conditions: [],
       concentration: null,
       defeated: false,
+      deathSaves: { success: 0, fail: 0, stable: false },
       position: { x: 0, y: 0 },
     }));
 
@@ -86,6 +101,16 @@ const EnemyForm = () => {
           Add
         </button>
       </div>
+
+      <label className="mt-2 flex items-center gap-2 text-sm text-gray-300">
+        <input
+          type="checkbox"
+          checked={asGroup}
+          onChange={() => setAsGroup(!asGroup)}
+          className="accent-red-600"
+        />
+        Group them (one shared initiative, collapsible in the turn order)
+      </label>
     </form>
   );
 };

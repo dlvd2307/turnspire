@@ -127,7 +127,7 @@ useEffect(() => {
       const data = {
         characters,
         round,
-        currentTurn: characters.findIndex(c => !c.defeated),
+        currentTurnId,
         gridConfig,
         spellMarkers,
       };
@@ -160,6 +160,15 @@ useEffect(() => {
           setGridConfig(data.gridConfig || { rows: 20, cols: 20, squareSize: 40 });
           setSpellMarkers(data.spellMarkers || []);
           setSelectedCharacterId(null);
+
+          if (typeof data.round === "number") {
+            window.dispatchEvent(new CustomEvent("set-round", { detail: data.round }));
+          }
+          if (data.currentTurnId) {
+            window.dispatchEvent(
+              new CustomEvent("set-current-turn", { detail: data.currentTurnId })
+            );
+          }
         } else {
           alert("Invalid scenario file.");
         }
@@ -168,6 +177,8 @@ useEffect(() => {
       }
     };
     reader.readAsText(file);
+    // Clear the input so picking the same file again still fires onChange.
+    event.target.value = "";
   };
 
   if (!loadedFromStorage) {
@@ -190,6 +201,12 @@ useEffect(() => {
       className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-2 rounded text-sm"
     >
       Save
+    </button>
+    <button
+      onClick={() => fileInputRef.current?.click()}
+      className="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded text-sm"
+    >
+      Load
     </button>
     <input
       ref={fileInputRef}

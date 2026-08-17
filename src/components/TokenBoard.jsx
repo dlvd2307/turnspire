@@ -304,7 +304,11 @@ const TokenBoard = () => {
                   height={14}
                 />
                 <Text
-                  text={`${char.hp} / ${char.maxHp}`}
+                  text={
+                    char.tempHp > 0
+                      ? `${char.hp} / ${char.maxHp} (+${char.tempHp})`
+                      : `${char.hp} / ${char.maxHp}`
+                  }
                   fontSize={10}
                   fill={isDefeated ? "#9CA3AF" : "#D1D5DB"}
                   align="center"

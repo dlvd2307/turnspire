@@ -11,6 +11,9 @@ const CharacterPanel = () => {
     markDefeated,
     removeCharacter,
     updateCharacterHP,
+    applyDamage,
+    applyHealing,
+    setTemporaryHP,
     updateCharacterAC,
     updateCharacterInitiative,
     recordDeathSaveSuccess,
@@ -26,6 +29,7 @@ const CharacterPanel = () => {
     name,
     hp,
     maxHp,
+    tempHp,
     ac,
     initiative,
     type,
@@ -73,20 +77,29 @@ const CharacterPanel = () => {
         </div>
       </div>
 
-      <div className="flex items-center flex-wrap gap-y-2">
-        <span>HP:</span>
-        <input
-          type="number"
-          value={hp}
-          onChange={(e) => updateCharacterHP(id, parseInt(e.target.value) || 0)}
-          className="ml-2 w-16 text-black px-1 rounded"
-        />
-        <span className="ml-1">/ {maxHp}</span>
+      <div className="rounded bg-slate-900/60 p-3">
         <HPAdjuster
           hp={hp}
           maxHp={maxHp}
-          onApply={(newHp) => updateCharacterHP(id, newHp)}
+          tempHp={tempHp ?? 0}
+          onDamage={(value) => applyDamage(id, value)}
+          onHeal={(value) => applyHealing(id, value)}
+          onSetTempHp={(value) => setTemporaryHP(id, value)}
         />
+        <div className="mt-3 flex items-center gap-2 border-t border-slate-700 pt-2">
+          <label className="text-xs text-slate-500" htmlFor="hp-direct">
+            Set HP directly
+          </label>
+          <input
+            id="hp-direct"
+            type="number"
+            value={hp}
+            onChange={(e) => updateCharacterHP(id, parseInt(e.target.value) || 0)}
+            className="w-16 rounded border border-slate-700 bg-slate-900 px-2 py-0.5
+                       text-center text-sm tabular-nums text-white
+                       focus:border-slate-400 focus:outline-none"
+          />
+        </div>
       </div>
 
       <p>

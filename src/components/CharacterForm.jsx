@@ -18,12 +18,14 @@ const CharacterForm = () => {
       name,
       hp: parseInt(hp),
       maxHp: parseInt(hp),
+      tempHp: 0,
       ac: parseInt(ac),
       initiative: initiative !== "" ? parseInt(initiative) : Math.floor(Math.random() * 20) + 1,
       type: "player",
       conditions: [],
       concentration: null,
       defeated: false,
+      deathSaves: { success: 0, fail: 0, stable: false },
       position: { x: 0, y: 0 },
     };
 

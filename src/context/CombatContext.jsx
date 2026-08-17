@@ -135,6 +135,7 @@ export const CombatProvider = ({ children }) => {
       conditions: [],
       concentration: null,
       defeated: false,
+      tempHp: 0,
       deathSaves: { success: 0, fail: 0, stable: false },
     };
     setCharacters((prev) => {
@@ -178,6 +179,52 @@ export const CombatProvider = ({ children }) => {
         // If they drop to 0, ensure death save state exists.
         return ensureDeathSaves({ ...char, hp: clamped });
       })
+    );
+  };
+
+  // Temporary hit points are absorbed before real ones, and are never
+  // restored by healing - they only go down, or get replaced outright.
+  const applyDamage = (id, amount) => {
+    const damage = Math.max(0, parseInt(amount) || 0);
+    if (!damage) return;
+    saveHistory();
+    setCharacters((prev) =>
+      prev.map((char) => {
+        if (char.id !== id) return char;
+        const temp = char.tempHp ?? 0;
+        const absorbed = Math.min(temp, damage);
+        const remainder = damage - absorbed;
+        const hp = Math.max(0, char.hp - remainder);
+        const updated = { ...char, tempHp: temp - absorbed, hp };
+        return hp === 0 ? ensureDeathSaves(updated) : updated;
+      })
+    );
+  };
+
+  const applyHealing = (id, amount) => {
+    const healing = Math.max(0, parseInt(amount) || 0);
+    if (!healing) return;
+    saveHistory();
+    setCharacters((prev) =>
+      prev.map((char) => {
+        if (char.id !== id) return char;
+        // Healing doesn't raise the dead - use the HP field directly for that.
+        if (char.defeated) return char;
+        const hp = Math.min(char.maxHp, char.hp + healing);
+        return hp > 0 ? { ...resetDeathSaves(char), hp } : char;
+      })
+    );
+  };
+
+  // Temp HP doesn't stack in 5e - a new source replaces the old one.
+  const setTemporaryHP = (id, value) => {
+    saveHistory();
+    setCharacters((prev) =>
+      prev.map((char) =>
+        char.id === id
+          ? { ...char, tempHp: Math.max(0, parseInt(value) || 0) }
+          : char
+      )
     );
   };
 
@@ -315,6 +362,7 @@ export const CombatProvider = ({ children }) => {
           conditions: [],
           concentration: null,
           defeated: false,
+          tempHp: 0,
           initiative: null,
           position: { x: 0, y: 0 },
         }))
@@ -381,6 +429,9 @@ export const CombatProvider = ({ children }) => {
         addCharacter,
         updateCharacterPosition,
         updateCharacterHP,
+        applyDamage,
+        applyHealing,
+        setTemporaryHP,
         updateCharacterAC,
         updateCharacterInitiative,
         recordDeathSaveSuccess,

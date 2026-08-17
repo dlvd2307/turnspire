@@ -35,28 +35,28 @@ const SpellMarkerForm = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-gray-800 p-4 rounded mb-4 space-y-2"
+      className="panel space-y-2"
     >
-      <h3 className="text-lg font-semibold mb-2">Add Spell Marker</h3>
+      <h3 className="panel-title">Add Spell Marker</h3>
       <div className="flex flex-wrap gap-3">
         <input
           type="text"
           placeholder="Label (e.g. Fog Cloud)"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
-          className="bg-gray-700 text-white p-2 rounded w-full sm:w-48"
+          className="field w-full sm:w-48"
         />
         <input
           type="number"
           placeholder="Size (ft)"
           value={size}
           onChange={(e) => setSize(e.target.value)}
-          className="bg-gray-700 text-white p-2 rounded w-full sm:w-24"
+          className="field w-full sm:w-24"
         />
         <select
           value={shape}
           onChange={(e) => setShape(e.target.value)}
-          className="bg-gray-700 text-white p-2 rounded w-full sm:w-32"
+          className="field w-full sm:w-32"
         >
           <option value="cube">Cube</option>
           <option value="sphere">Sphere</option>
@@ -64,7 +64,7 @@ const SpellMarkerForm = () => {
         </select>
         <button
           type="submit"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
+          className="btn btn-primary"
         >
           Add Marker
         </button>

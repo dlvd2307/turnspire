@@ -30,14 +30,14 @@ const GridSettings = () => {
     <div className="mb-4 max-w-xl mx-auto">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded shadow mb-2"
+        className="btn btn-secondary mb-2"
       >
         ⚙️ {isOpen ? "Hide" : "Show"} Grid Settings
       </button>
 
       {isOpen && (
-        <div className="bg-overlay p-4 rounded shadow-md border border-gray-600">
-          <h3 className="text-lg font-semibold mb-3 font-fantasy">Adjust Battlefield Dimensions</h3>
+        <div className="bg-overlay p-4 rounded shadow-md border border-slate-600">
+          <h3 className="panel-title">Battlefield Dimensions</h3>
           <div className="flex flex-wrap gap-4">
             <label className="flex items-center gap-2">
               <span>Rows:</span>
@@ -45,7 +45,7 @@ const GridSettings = () => {
                 type="number"
                 value={gridConfig.rows}
                 onChange={(e) => update("rows", e.target.value)}
-                className="w-20 p-2 bg-gray-700 text-white rounded"
+                className="field field-sm w-20"
               />
             </label>
             <label className="flex items-center gap-2">
@@ -54,7 +54,7 @@ const GridSettings = () => {
                 type="number"
                 value={gridConfig.cols}
                 onChange={(e) => update("cols", e.target.value)}
-                className="w-20 p-2 bg-gray-700 text-white rounded"
+                className="field field-sm w-20"
               />
             </label>
             <label className="flex items-center gap-2">
@@ -63,7 +63,7 @@ const GridSettings = () => {
                 type="number"
                 value={gridConfig.squareSize}
                 onChange={(e) => update("squareSize", e.target.value)}
-                className="w-24 p-2 bg-gray-700 text-white rounded"
+                className="field field-sm w-24"
               />
             </label>
             <label className="flex items-center gap-2">
@@ -71,7 +71,7 @@ const GridSettings = () => {
               <select
                 value={gridConfig.backgroundType}
                 onChange={(e) => update("backgroundType", e.target.value)}
-                className="px-2 py-1 bg-gray-700 text-white rounded"
+                className="field field-sm"
               >
                 <option value="none">None</option>
                 <option value="grass">Grass</option>

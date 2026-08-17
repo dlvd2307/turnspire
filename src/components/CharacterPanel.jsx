@@ -54,7 +54,7 @@ const CharacterPanel = () => {
   const stable = deathSaves?.stable ?? false;
 
   return (
-    <div className="bg-gray-800 text-white p-4 rounded shadow max-w-md w-full mt-4 space-y-3">
+    <div className="panel mt-4 w-full max-w-md space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">{name}</h2>
         <div className="space-x-2">
@@ -116,7 +116,7 @@ const CharacterPanel = () => {
             updateCharacterAC(id, 0);
           }
         }}
-          className="ml-2 w-16 text-black px-1 rounded"
+          className="field field-sm ml-2 w-16 text-center"
         />
       </p>
 
@@ -126,7 +126,7 @@ const CharacterPanel = () => {
           type="number"
           value={initiative ?? ""}
           onChange={(e) => updateCharacterInitiative(id, e.target.value)}
-          className="ml-2 w-16 text-black px-1 rounded"
+          className="field field-sm ml-2 w-16 text-center"
         />
       </p>
 
@@ -153,19 +153,19 @@ const CharacterPanel = () => {
               <div className="flex gap-2">
                 <button
                   onClick={() => recordDeathSaveSuccess(id)}
-                  className="bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded text-sm"
+                  className="btn btn-sm btn-success"
                 >
                   + Success
                 </button>
                 <button
                   onClick={() => recordDeathSaveFailure(id)}
-                  className="bg-red-700 hover:bg-red-800 text-white px-2 py-1 rounded text-sm"
+                  className="btn btn-sm btn-danger"
                 >
                   + Failure
                 </button>
                 <button
                   onClick={() => clearDeathSaves(id)}
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-sm"
+                  className="btn btn-sm btn-secondary"
                 >
                   Reset
                 </button>
@@ -186,7 +186,7 @@ const CharacterPanel = () => {
             {conditions.map((cond, index) => (
               <li
                 key={index}
-                className="flex items-center justify-between bg-gray-700 px-2 py-1 rounded"
+                className="flex items-center justify-between bg-slate-700 px-2 py-1 rounded"
               >
                 <span>
                   {cond.name} ({cond.remainingRounds} round
@@ -207,7 +207,7 @@ const CharacterPanel = () => {
       {concentration && (
         <div>
           <h3 className="font-semibold mb-1">Concentration:</h3>
-          <div className="flex items-center justify-between bg-gray-700 px-2 py-1 rounded">
+          <div className="flex items-center justify-between bg-slate-700 px-2 py-1 rounded">
             <span>
               {concentration.spell} ({concentration.remainingRounds} round
               {concentration.remainingRounds > 1 ? "s" : ""})

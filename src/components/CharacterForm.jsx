@@ -38,15 +38,15 @@ const CharacterForm = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">Add Character</h2>
+      <form onSubmit={handleSubmit} className="panel">
+        <h2 className="panel-title">Add Character</h2>
         <div className="flex gap-2 items-center flex-wrap">
           <input
             type="text"
             placeholder="Character Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="px-2 py-1 rounded bg-gray-800 text-white w-full sm:w-auto"
+            className="field w-full sm:w-auto"
           />
           <input
             type="number"
@@ -54,7 +54,7 @@ const CharacterForm = () => {
             placeholder="HP"
             value={hp}
             onChange={(e) => setHp(e.target.value)}
-            className="w-20 px-2 py-1 rounded bg-gray-800 text-white"
+            className="field field-sm w-20"
           />
           <input
             type="number"
@@ -62,7 +62,7 @@ const CharacterForm = () => {
             placeholder="AC"
             value={ac}
             onChange={(e) => setAc(e.target.value)}
-            className="w-20 px-2 py-1 rounded bg-gray-800 text-white"
+            className="field field-sm w-20"
           />
           <input
             type="number"
@@ -70,11 +70,11 @@ const CharacterForm = () => {
             placeholder="Initiative"
             value={initiative}
             onChange={(e) => setInitiative(e.target.value)}
-            className="w-24 px-2 py-1 rounded bg-gray-800 text-white"
+            className="field field-sm w-24"
           />
           <button
             type="submit"
-            className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded"
+            className="btn btn-primary"
           >
             Add
           </button>
@@ -83,9 +83,10 @@ const CharacterForm = () => {
 
       <button
         onClick={softResetCombat}
-        className="bg-yellow-700 hover:bg-yellow-800 text-white px-3 py-1 rounded"
+        className="btn btn-secondary btn-sm"
+        title="Clear enemies and combat state, keep your party"
       >
-        Soft Reset (Keep Characters)
+        Soft Reset (Keep Party)
       </button>
     </>
   );

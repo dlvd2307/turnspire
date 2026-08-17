@@ -54,7 +54,7 @@ const InitiativeList = () => {
 
   return (
     <div className="mb-6">
-      <h2 className="text-xl font-semibold mb-2">Initiative Order</h2>
+      <h2 className="panel-title">Initiative Order</h2>
       <ul className="space-y-1.5">
         {/* Render ungrouped characters */}
         {sortedUngrouped.map((char) => (

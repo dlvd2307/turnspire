@@ -45,8 +45,8 @@ const ConditionManager = () => {
   };
 
   return (
-    <div className="bg-gray-800 p-4 rounded mt-4">
-      <h3 className="text-lg font-semibold mb-2">Conditions</h3>
+    <div className="panel mt-4">
+      <h3 className="panel-title">Conditions</h3>
 
       {selected?.conditions.length > 0 && (
         <ul className="mb-2 list-disc list-inside text-sm">
@@ -65,18 +65,18 @@ const ConditionManager = () => {
           placeholder="Condition (e.g. Poisoned)"
           value={conditionName}
           onChange={(e) => setConditionName(e.target.value)}
-          className="bg-gray-700 text-white p-2 rounded w-48"
+          className="field w-48"
         />
         <input
           type="number"
           placeholder="Rounds"
           value={duration}
           onChange={(e) => setDuration(e.target.value)}
-          className="bg-gray-700 text-white p-2 rounded w-24"
+          className="field w-24"
         />
         <button
           onClick={applyCondition}
-          className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded"
+          className="btn btn-primary"
         >
           Apply
         </button>

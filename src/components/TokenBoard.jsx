@@ -65,8 +65,8 @@ const TokenBoard = () => {
   }, [selectedMarkerId, spellMarkers]);
 
   return (
-    <div className="mx-auto mb-6 border border-gray-700 rounded overflow-hidden">
-      <Stage width={width} height={height} draggable style={{ backgroundColor: "#1F2937" }}>
+    <div className="overflow-auto rounded-xl border border-slate-800">
+      <Stage width={width} height={height} draggable style={{ backgroundColor: "#0f172a" }}>
         {/* Background */}
         <Layer>
           {bgImage && (
@@ -91,7 +91,7 @@ const TokenBoard = () => {
                 y={row * squareSize}
                 width={squareSize}
                 height={squareSize}
-                stroke="#4B5563"
+                stroke="#334155"
               />
             ))
           )}

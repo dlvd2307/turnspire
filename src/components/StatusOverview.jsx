@@ -10,8 +10,8 @@ const StatusOverview = () => {
   if (charactersWithStatuses.length === 0) return null;
 
   return (
-    <div className="bg-gray-800 p-4 rounded mt-4">
-      <h3 className="text-lg font-semibold mb-3">Active Effects</h3>
+    <div className="panel mt-4">
+      <h3 className="panel-title">Active Effects</h3>
       <div className="space-y-4">
         {charactersWithStatuses.map((char) => (
           <div key={char.id}>

@@ -78,33 +78,33 @@ const ScenarioLibrary = () => {
   };
 
   return (
-    <div className="bg-gray-800 p-4 rounded mb-6">
-      <h2 className="text-lg font-bold mb-3">Scenario Library</h2>
+    <div className="panel mb-6">
+      <h2 className="panel-title">Scenario Library</h2>
 
       {scenarios.length === 0 ? (
-        <p className="text-gray-400 text-sm">No saved scenarios yet.</p>
+        <p className="text-slate-400 text-sm">No saved scenarios yet.</p>
       ) : (
         <ul className="space-y-3">
           {scenarios.map((scen, index) => (
-            <li key={index} className="bg-gray-900 rounded p-3">
+            <li key={index} className="bg-slate-900 rounded p-3">
               <div className="flex justify-between items-center">
                 <span className="font-semibold">{scen.name || "Unnamed Scenario"}</span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => loadScenario(scen)}
-                    className="text-sm bg-green-600 hover:bg-green-700 px-2 py-1 rounded text-white"
+                    className="btn btn-sm btn-success"
                   >
                     Load
                   </button>
                   <button
                     onClick={() => exportScenario(scen)}
-                    className="text-sm bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-white"
+                    className="btn btn-sm btn-secondary"
                   >
                     Export
                   </button>
                   <button
                     onClick={() => deleteScenario(index)}
-                    className="text-sm bg-red-600 hover:bg-red-700 px-2 py-1 rounded text-white"
+                    className="btn btn-sm btn-danger"
                   >
                     Delete
                   </button>
@@ -118,7 +118,7 @@ const ScenarioLibrary = () => {
       <div className="mt-4">
         <button
           onClick={handleImportClick}
-          className="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2 rounded"
+          className="btn btn-secondary"
         >
           Import Scenario
         </button>

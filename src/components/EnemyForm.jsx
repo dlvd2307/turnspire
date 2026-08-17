@@ -52,15 +52,15 @@ const EnemyForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4">
-      <h2 className="text-lg font-semibold mb-2">Add Enemies / Groups</h2>
+    <form onSubmit={handleSubmit} className="panel">
+      <h2 className="panel-title">Add Enemies / Groups</h2>
       <div className="flex gap-2 items-center flex-wrap">
         <input
           type="text"
           placeholder="Enemy Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="px-2 py-1 rounded bg-gray-800 text-white w-full sm:w-auto"
+          className="field w-full sm:w-auto"
         />
         <input
           type="number"
@@ -68,7 +68,7 @@ const EnemyForm = () => {
           placeholder="HP"
           value={hp}
           onChange={(e) => setHp(e.target.value)}
-          className="w-20 px-2 py-1 rounded bg-gray-800 text-white"
+          className="field field-sm w-20"
         />
         <input
           type="number"
@@ -76,7 +76,7 @@ const EnemyForm = () => {
           placeholder="AC"
           value={ac}
           onChange={(e) => setAc(e.target.value)}
-          className="w-20 px-2 py-1 rounded bg-gray-800 text-white"
+          className="field field-sm w-20"
         />
         <input
           type="number"
@@ -84,7 +84,7 @@ const EnemyForm = () => {
           placeholder="#"
           value={count}
           onChange={(e) => setCount(e.target.value)}
-          className="w-16 px-2 py-1 rounded bg-gray-800 text-white"
+          className="field field-sm w-16"
         />
         <input
           type="number"
@@ -92,17 +92,17 @@ const EnemyForm = () => {
           placeholder="Initiative"
           value={initiative}
           onChange={(e) => setInitiative(e.target.value)}
-          className="w-24 px-2 py-1 rounded bg-gray-800 text-white"
+          className="field field-sm w-24"
         />
         <button
           type="submit"
-          className="bg-red-700 hover:bg-red-800 text-white px-3 py-1 rounded"
+          className="btn btn-primary"
         >
           Add
         </button>
       </div>
 
-      <label className="mt-2 flex items-center gap-2 text-sm text-gray-300">
+      <label className="mt-2 flex items-center gap-2 text-sm text-slate-300">
         <input
           type="checkbox"
           checked={asGroup}

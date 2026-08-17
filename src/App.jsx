@@ -182,66 +182,65 @@ useEffect(() => {
   };
 
   if (!loadedFromStorage) {
-    return <div className="text-center mt-20 text-gray-400">Loading Turnspire…</div>;
+    return <div className="mt-20 text-center text-slate-400">Loading Turnspire…</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white px-4 py-6">
+    <div className="min-h-screen">
       {showRoundBanner && (
-        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-yellow-600 text-black px-6 py-2 rounded-lg shadow-lg z-50 text-lg font-bold">
-          ⚔️ Round {round} Begins!
+        <div className="fixed left-1/2 top-20 z-50 -translate-x-1/2 rounded-full
+                        border border-amber-500/30 bg-amber-500/15 px-5 py-2
+                        text-sm font-semibold text-amber-200 backdrop-blur">
+          Round {round} begins
         </div>
       )}
 
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-  {/* Left: Save Button */}
-  <div className="flex items-center gap-2 mb-2 sm:mb-0">
-    <button
-      onClick={handleSave}
-      className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-2 rounded text-sm"
-    >
-      Save
-    </button>
-    <button
-      onClick={() => fileInputRef.current?.click()}
-      className="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded text-sm"
-    >
-      Load
-    </button>
-    <input
-      ref={fileInputRef}
-      type="file"
-      accept=".json"
-      onChange={(e) => handleFileChange(e)}
-      className="hidden"
-    />
-  </div>
+      <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/85 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
+          <img
+            src="/assets/turnspirelogo.png"
+            alt="Turnspire"
+            className="h-9 w-auto sm:h-11"
+          />
 
-  {/* Center: Logo */}
-  <img
-    src="/assets/turnspirelogo.png"
-    alt="Turnspire Logo"
-    className="h-28 sm:h-32 w-auto drop-shadow-lg"
-  />
-
-  {/* Right: Reset + Timestamp */}
-  <div className="flex items-center gap-3 mt-2 sm:mt-0 sm:text-right text-sm text-gray-400">
-    <button
-      onClick={() => {
-        const confirmed = confirm("This will clear the entire board. Are you sure?");
-        if (confirmed) resetCombat();
-      }}
-      className="bg-red-700 hover:bg-red-800 text-white px-3 py-2 rounded text-sm"
-    >
-      Reset
-    </button>
-    {lastAutosave && <div>Last autosave: {lastAutosave}</div>}
-  </div>
-</header>
+          <div className="flex items-center gap-2">
+            {lastAutosave && (
+              <span className="hidden text-xs text-slate-500 sm:inline">
+                Saved {lastAutosave}
+              </span>
+            )}
+            <button onClick={handleSave} className="btn btn-secondary btn-sm">
+              Save
+            </button>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="btn btn-secondary btn-sm"
+            >
+              Load
+            </button>
+            <button
+              onClick={() => {
+                const confirmed = confirm("This will clear the entire board. Are you sure?");
+                if (confirmed) resetCombat();
+              }}
+              className="btn btn-danger btn-sm"
+            >
+              Reset
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={(e) => handleFileChange(e)}
+              className="hidden"
+            />
+          </div>
+        </div>
+      </header>
 
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3">
+      <main className="mx-auto max-w-7xl grid grid-cols-1 gap-6 px-4 py-6 lg:grid-cols-5">
+        <div className="space-y-6 lg:col-span-3">
           <ScenarioLibrary />
           <CharacterForm />
           <EnemyForm />
@@ -249,42 +248,46 @@ useEffect(() => {
           <TokenBoard />
           <GridSettings />
         </div>
-        <div className="lg:col-span-2">
-          <InitiativeList />
-          <div className="flex justify-between items-center mb-4 space-x-2">
-            <h2 className="text-lg font-semibold">Round: {round}</h2>
-            <div className="flex space-x-2">
+        <div className="space-y-6 lg:col-span-2">
+          {/* Turn controls sit above the order - the thing you touch most. */}
+          <div className="flex items-center justify-between gap-3 rounded-xl
+                          border border-slate-800 bg-slate-900/70 px-4 py-3">
+            <div>
+              <div className="label">Round</div>
+              <div className="text-2xl font-semibold tabular-nums leading-none">
+                {round}
+              </div>
+            </div>
+            <div className="flex gap-2">
               <button
                 onClick={() => window.dispatchEvent(new Event("undo-action"))}
-                className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-white"
-                title="Undo last action"
+                className="btn btn-secondary"
+                title="Undo last action (Ctrl+Z)"
               >
                 Undo
               </button>
-              <button
-                onClick={nextTurn}
-                className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white"
-              >
+              <button onClick={nextTurn} className="btn btn-success">
                 Next Turn
               </button>
             </div>
           </div>
+          <InitiativeList />
           <ConditionManager />
           <ConcentrationManager />
           <StatusOverview />
           <CharacterPanel />
         </div>
-      </div>
+      </main>
 
-      <footer className="mt-10 text-center text-sm text-gray-400 space-y-1">
+      <footer className="mx-auto max-w-7xl border-t border-slate-800 px-4 py-8 text-center text-sm text-slate-400 space-y-1">
   <p>Thank you for using Turnspire.</p>
   <p>
     If you have questions, ideas, or need help, email me at{" "}
-    <a href="mailto:turnspire@gmail.com" className="text-blue-400 underline">
+    <a href="mailto:turnspire@gmail.com" className="text-indigo-400 hover:text-indigo-300">
       turnspire@gmail.com
     </a>.
   </p>
-  <p className="pt-2 text-xs text-gray-500">
+  <p className="pt-2 text-xs text-slate-500">
     © {new Date().getFullYear()} Dylan van Dijk. All rights reserved.
   </p>
 </footer>
@@ -292,7 +295,7 @@ useEffect(() => {
 
       <button
         onClick={() => setIsHelpOpen(true)}
-        className="fixed bottom-4 right-4 bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-3 py-2 rounded-full shadow-lg"
+        className="fixed bottom-4 right-4 h-10 w-10 rounded-full border border-slate-700 bg-slate-800 text-slate-300 shadow-lg transition-colors hover:bg-slate-700 hover:text-white"
         title="Help"
       >
         ?

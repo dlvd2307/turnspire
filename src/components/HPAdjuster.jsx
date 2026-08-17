@@ -83,15 +83,13 @@ const HPAdjuster = ({ hp, maxHp, tempHp = 0, onDamage, onHeal, onSetTempHp }) =>
           onKeyDown={handleAmountKey}
           placeholder="0"
           aria-label="Damage or healing amount"
-          className="w-16 rounded border border-slate-600 bg-slate-900 px-2 py-1
-                     text-center tabular-nums text-white
-                     focus:border-slate-400 focus:outline-none"
+          className="field field-sm w-16 text-center"
         />
         <button
           type="button"
           onClick={() => submit(onDamage)}
           title="Apply damage (Enter)"
-          className="rounded bg-red-700 px-3 py-1 text-sm text-white hover:bg-red-600"
+          className="btn btn-danger btn-sm"
         >
           Damage
         </button>
@@ -99,7 +97,7 @@ const HPAdjuster = ({ hp, maxHp, tempHp = 0, onDamage, onHeal, onSetTempHp }) =>
           type="button"
           onClick={() => submit(onHeal)}
           title="Heal (Shift+Enter)"
-          className="rounded bg-emerald-700 px-3 py-1 text-sm text-white hover:bg-emerald-600"
+          className="btn btn-success btn-sm"
         >
           Heal
         </button>
@@ -119,9 +117,7 @@ const HPAdjuster = ({ hp, maxHp, tempHp = 0, onDamage, onHeal, onSetTempHp }) =>
           onKeyDown={handleTempKey}
           onBlur={commitTemp}
           placeholder={String(tempHp)}
-          className="w-16 rounded border border-slate-600 bg-slate-900 px-2 py-1
-                     text-center tabular-nums text-white
-                     focus:border-slate-400 focus:outline-none"
+          className="field field-sm w-16 text-center"
         />
         {tempHp > 0 && (
           <button

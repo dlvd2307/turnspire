@@ -196,11 +196,11 @@ useEffect(() => {
       )}
 
       <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/85 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2">
           <img
             src="/assets/turnspirelogo.png"
             alt="Turnspire"
-            className="h-9 w-auto sm:h-11"
+            className="h-14 w-auto sm:h-20"
           />
 
           <div className="flex items-center gap-2">

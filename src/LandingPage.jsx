@@ -34,11 +34,11 @@ export default function LandingPage() {
     <div className="min-h-screen bg-slate-950 text-slate-100">
       {/* ---- Top bar ---- */}
       <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-2">
           <img
             src="/assets/turnspirelogo.png"
             alt="Turnspire"
-            className="h-9 w-auto"
+            className="h-14 w-auto sm:h-16"
           />
           <Link to="/app" className="btn btn-primary btn-sm">
             Launch Turnspire
@@ -57,14 +57,18 @@ export default function LandingPage() {
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-gradient-to-b from-slate-950/80 via-slate-950/85 to-slate-950"
+          className="absolute inset-0 -z-10 bg-gradient-to-b from-slate-950/45 via-slate-950/35 to-slate-950"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(2,6,23,0.65)_0%,transparent_70%)]"
         />
 
-        <div className="mx-auto max-w-3xl px-6 py-24 text-center sm:py-32">
-          <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">
+        <div className="mx-auto max-w-3xl px-6 py-28 text-center sm:py-40">
+          <h1 className="text-4xl font-semibold tracking-tight drop-shadow-[0_2px_12px_rgba(2,6,23,0.9)] sm:text-6xl">
             Run combat, not spreadsheets.
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300">
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-200 drop-shadow-[0_1px_8px_rgba(2,6,23,0.9)]">
             Turnspire tracks initiative, hit points, conditions, and positions in
             one screen — so you can keep your attention on the table instead of
             the arithmetic.

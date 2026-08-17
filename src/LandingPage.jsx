@@ -34,11 +34,11 @@ export default function LandingPage() {
     <div className="min-h-screen bg-slate-950 text-slate-100">
       {/* ---- Top bar ---- */}
       <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-2">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-1">
           <img
             src="/assets/turnspirelogo.png"
             alt="Turnspire"
-            className="h-14 w-auto sm:h-16"
+            className="h-20 w-auto sm:h-28"
           />
           <Link to="/app" className="btn btn-primary btn-sm">
             Launch Turnspire

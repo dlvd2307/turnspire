@@ -1,5 +1,6 @@
 // src/components/CharacterPanel.jsx
 import { useCombat } from "../context/CombatContext";
+import HPAdjuster from "./HPAdjuster";
 
 const CharacterPanel = () => {
   const {
@@ -72,16 +73,21 @@ const CharacterPanel = () => {
         </div>
       </div>
 
-      <p>
-        HP:{" "}
+      <div className="flex items-center flex-wrap gap-y-2">
+        <span>HP:</span>
         <input
           type="number"
           value={hp}
           onChange={(e) => updateCharacterHP(id, parseInt(e.target.value) || 0)}
           className="ml-2 w-16 text-black px-1 rounded"
-        />{" "}
-        / {maxHp}
-      </p>
+        />
+        <span className="ml-1">/ {maxHp}</span>
+        <HPAdjuster
+          hp={hp}
+          maxHp={maxHp}
+          onApply={(newHp) => updateCharacterHP(id, newHp)}
+        />
+      </div>
 
       <p>
         AC:{" "}

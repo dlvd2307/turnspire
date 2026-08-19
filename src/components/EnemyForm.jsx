@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useCombat } from "../context/CombatContext";
 import { v4 as uuidv4 } from "uuid";
+import MonsterSearch from "./MonsterSearch";
 
 const EnemyForm = () => {
   const { setCharacters } = useCombat();
@@ -10,6 +11,31 @@ const EnemyForm = () => {
   const [count, setCount] = useState("");
   const [initiative, setInitiative] = useState("");
   const [asGroup, setAsGroup] = useState(true);
+  // Only set when a stat block is pulled in; manual entries roll a flat d20.
+  const [initiativeBonus, setInitiativeBonus] = useState(null);
+  const [sourceName, setSourceName] = useState(null);
+
+  const applyMonster = (monster) => {
+    setName(monster.name);
+    setHp(String(monster.hp));
+    setAc(String(monster.ac));
+    setInitiativeBonus(monster.initiativeBonus);
+    setSourceName(monster.name);
+    if (count === "") setCount("1");
+  };
+
+  const clearForm = () => {
+    setName("");
+    setHp("");
+    setAc("");
+    setCount("");
+    setInitiative("");
+    setInitiativeBonus(null);
+    setSourceName(null);
+  };
+
+  const rollInitiative = () =>
+    Math.floor(Math.random() * 20) + 1 + (initiativeBonus ?? 0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -20,7 +46,7 @@ const EnemyForm = () => {
 
     // A group shares one initiative roll, so they act together in the order.
     const sharedInitiative =
-      initiative !== "" ? parseInt(initiative) : Math.floor(Math.random() * 20) + 1;
+      initiative !== "" ? parseInt(initiative) : rollInitiative();
 
     const newEnemies = Array.from({ length: total }).map((_, i) => ({
       id: uuidv4(),
@@ -33,7 +59,7 @@ const EnemyForm = () => {
         ? sharedInitiative
         : initiative !== ""
         ? parseInt(initiative)
-        : Math.floor(Math.random() * 20) + 1,
+        : rollInitiative(),
       type: "enemy",
       groupName: grouped ? name : undefined,
       conditions: [],
@@ -44,22 +70,38 @@ const EnemyForm = () => {
     }));
 
     setCharacters((prev) => [...prev, ...newEnemies]);
-    setName("");
-    setHp("");
-    setAc("");
-    setCount("");
-    setInitiative("");
+    clearForm();
   };
 
   return (
     <form onSubmit={handleSubmit} className="panel">
       <h2 className="panel-title">Add Enemies / Groups</h2>
+
+      <MonsterSearch onSelect={applyMonster} />
+
+      {sourceName && (
+        <div className="mb-3 flex items-center gap-2 text-xs text-slate-400">
+          <span className="tag">SRD: {sourceName}</span>
+          <span>Edit any field below to customise.</span>
+          <button
+            type="button"
+            onClick={clearForm}
+            className="underline hover:text-slate-200"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
       <div className="flex gap-2 items-center flex-wrap">
         <input
           type="text"
           placeholder="Enemy Name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            setSourceName(null);
+          }}
           className="field w-full sm:w-auto"
         />
         <input

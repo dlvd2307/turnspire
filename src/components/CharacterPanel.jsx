@@ -48,7 +48,9 @@ const CharacterPanel = () => {
     if (!defeated) markDefeated(id);
   };
 
-  const isDown = hp === 0 && !defeated;
+  // Death saves apply to player characters only - enemies simply drop.
+  const isDown = hp === 0 && !defeated && type !== "enemy";
+  const enemyDropped = hp === 0 && !defeated && type === "enemy";
   const successes = deathSaves?.success ?? 0;
   const fails = deathSaves?.fail ?? 0;
   const stable = deathSaves?.stable ?? false;
@@ -131,6 +133,19 @@ const CharacterPanel = () => {
       </p>
 
       <p>Type: {type === "enemy" ? "Enemy" : "Character"}</p>
+
+      {enemyDropped && (
+        <div className="flex items-center justify-between gap-3 rounded-lg border
+                        border-amber-500/30 bg-amber-500/10 px-3 py-2">
+          <span className="text-sm text-amber-200">Reduced to 0 HP</span>
+          <button
+            onClick={handleDefeat}
+            className="btn btn-sm btn-danger"
+          >
+            Mark Defeated
+          </button>
+        </div>
+      )}
 
       {/* Death Saves */}
       {isDown && (

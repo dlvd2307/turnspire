@@ -32,6 +32,10 @@ const HelpPopup = ({ isOpen, onClose }) => {
             <p><strong>↩️ Undo:</strong> Made a mistake? Use the <span className="tag">Undo</span> button or press Ctrl+Z to roll back your last action.</p>
             <p><strong>☕ Support the Project:</strong> Enjoying Turnspire? Click the Ko-fi button to buy me a potion.</p>
             <p><strong>📬 Need Help?</strong> Email <a href="mailto:turnspire@gmail.com" className="text-blue-400 underline">turnspire@gmail.com</a>.</p>
+            <p><strong>🐉 Monster Search:</strong> Type a creature name in the Add Enemies panel to pull its HP, AC, and initiative bonus from the SRD. Every field stays editable, so you can tweak a stat block or ignore the search entirely for homebrew.</p>
+            <p className="pt-2 text-xs text-slate-500">
+              Monster data from <a href="https://open5e.com" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300">Open5e</a>, drawn from the System Reference Document 5.2 by Wizards of the Coast, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300">CC BY 4.0</a>.
+            </p>
           </div>
           <div className="mt-6 text-right">
             <button

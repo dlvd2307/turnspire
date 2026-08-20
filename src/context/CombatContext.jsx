@@ -1,5 +1,7 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { parseScenario } from "../utils/scenario";
+import { safeGet, safeSet } from "../utils/safeStorage";
 
 const CombatContext = createContext();
 
@@ -18,7 +20,17 @@ export const CombatProvider = ({ children }) => {
   const [spellMarkers, setSpellMarkers] = useState([]);
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
   const [history, setHistory] = useState([]);
+  // Remembers where the current combatant sits in the initiative order, so the
+  // turn can be resumed if they're removed or defeated mid-round.
+  const turnAnchorRef = useRef(null);
   const [loadedFromStorage, setLoadedFromStorage] = useState(false);
+
+  useEffect(() => {
+    const current = characters.find((c) => c.id === currentTurnId);
+    if (current) {
+      turnAnchorRef.current = { id: current.id, initiative: current.initiative };
+    }
+  }, [currentTurnId, characters]);
 
   const saveHistory = () => {
     setHistory((prev) => [
@@ -85,10 +97,10 @@ export const CombatProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem("turnspire-autosave");
+    const saved = safeGet("turnspire-autosave");
     if (saved) {
       try {
-        const data = JSON.parse(saved);
+        const data = parseScenario(saved) || {};
         setCharacters(data.characters || []);
         setGridConfig(data.gridConfig || { rows: 20, cols: 20, squareSize: 40 });
         setSpellMarkers(data.spellMarkers || []);
@@ -124,7 +136,7 @@ export const CombatProvider = ({ children }) => {
       gridConfig,
       spellMarkers,
     };
-    localStorage.setItem("turnspire-autosave", JSON.stringify(data));
+    safeSet("turnspire-autosave", data);
   }, [characters, round, currentTurnId, gridConfig, spellMarkers, loadedFromStorage]);
 
   const addCharacter = (char) => {
@@ -331,10 +343,35 @@ export const CombatProvider = ({ children }) => {
 
   const removeCharacter = (id) => {
     saveHistory();
-    setCharacters((prev) => prev.filter((char) => char.id !== id));
-    if (currentTurnId === id) {
+    const removed = characters.find((char) => char.id === id);
+    const remaining = characters.filter((char) => char.id !== id);
+    setCharacters(remaining);
+
+    if (currentTurnId !== id) return;
+
+    // Deleting whoever's turn it is should hand the turn straight to the next
+    // combatant, not leave the order pointing at nobody.
+    const sorted = remaining
+      .filter((c) => !c.defeated && c.initiative != null)
+      .sort((a, b) => b.initiative - a.initiative);
+
+    const anchorInitiative =
+      removed?.initiative ?? turnAnchorRef.current?.initiative ?? null;
+
+    const resumeIndex =
+      anchorInitiative === null
+        ? -1
+        : sorted.findIndex((c) => c.initiative <= anchorInitiative);
+
+    if (resumeIndex === -1) {
+      // They were last in the order (or nobody's left), so the next press
+      // should begin a new round properly - conditions tick, round advances.
       setCurrentTurnId(null);
+      return;
     }
+
+    setCurrentTurnId(sorted[resumeIndex].id);
+    setSelectedCharacterId(sorted[resumeIndex].id);
   };
 
   const resetCombat = () => {
@@ -388,12 +425,36 @@ export const CombatProvider = ({ children }) => {
     if (!sorted.length) return;
 
     const currentIndex = sorted.findIndex((c) => c.id === currentTurnId);
-    const nextIndex = (currentIndex + 1) % sorted.length;
+
+    let nextIndex;
+    let isNewRound;
+
+    if (currentIndex !== -1) {
+      nextIndex = (currentIndex + 1) % sorted.length;
+      isNewRound = nextIndex === 0;
+    } else {
+      // Whoever's turn it was has left the fight - deleted from the board or
+      // marked defeated. Pick up from their position in the order rather than
+      // snapping back to the top and burning a round.
+      const anchor = turnAnchorRef.current;
+      const resumeIndex = anchor
+        ? sorted.findIndex((c) => c.initiative <= anchor.initiative)
+        : -1;
+
+      if (resumeIndex === -1) {
+        // They were last in the order (or we have nothing to go on), so this
+        // genuinely is the top of a new round.
+        nextIndex = 0;
+        isNewRound = true;
+      } else {
+        nextIndex = resumeIndex;
+        isNewRound = false;
+      }
+    }
+
     const nextChar = sorted[nextIndex];
     setCurrentTurnId(nextChar.id);
     setSelectedCharacterId(nextChar.id);
-
-    const isNewRound = nextIndex === 0;
     if (isNewRound) {
       setRound((r) => r + 1);
       saveHistory();
